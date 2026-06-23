@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TIA Portal Export",
+  "title_cn": "TIA Portal 导出",
+  "description": "Export content from Siemens TIA Portal projects (V17-V20)",
+  "description_cn": "从西门子 TIA Portal 项目 (V17-V20) 导出内容",
+  "type": "object",
+  "required": ["indir", "outdir"],
+  "properties": {
+    "indir": {
+      "type": "string",
+      "format": "data-url",
+      "title": "Input Directory",
+      "title_cn": "输入目录",
+      "description": "Directory containing TIA Portal project files (.ap17–.ap20, .zap17–.zap20)",
+      "description_cn": "包含 TIA Portal 项目文件的目录 (.ap17–.ap20, .zap17–.zap20)"
+    },
+    "outdir": {
+      "type": "string",
+      "format": "data-url",
+      "title": "Output Directory",
+      "title_cn": "输出目录",
+      "description": "Directory where exported files will be saved",
+      "description_cn": "导出文件保存目录"
+    },
+    "exportMode": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["all", "hardware", "block", "tag", "udt", "watchtable", "reference"]
+      },
+      "title": "Export Mode",
+      "title_cn": "导出模式",
+      "description": "Comma-separated list of content types to export, or \"all\" for everything",
+      "description_cn": "逗号分隔的导出内容类型列表，或 \"all\" 导出全部",
+      "uniqueItems": true
+    },
+    "keepFolderStructure": {
+      "type": "boolean",
+      "title": "Keep Folder Structure",
+      "title_cn": "保留文件夹结构",
+      "description": "Preserve the original TIA Portal group hierarchy in the output",
+      "description_cn": "在输出中保留原始 TIA Portal 组层次结构",
+      "default": false
+    },
+    "maxWorkers": {
+      "type": "integer",
+      "title": "Max Parallel Workers",
+      "title_cn": "最大并行数",
+      "description": "Maximum number of parallel project exports (leave empty for auto)",
+      "description_cn": "并行项目导出的最大数量（留空自动）",
+      "minimum": 1,
+      "maximum": 32
+    },
+    "projectFilter": {
+      "type": "string",
+      "title": "Project Filter (Regex)",
+      "title_cn": "项目过滤器（正则）",
+      "description": "Regular expression to filter project names (e.g. \"^Line.*\" for projects starting with \"Line\")",
+      "description_cn": "用于过滤项目名称的正则表达式（例如 \"^Line.*\" 匹配以 \"Line\" 开头的项目）"
+    },
+    "sclFormat": {
+      "type": "string",
+      "title": "SCL Block Format",
+      "title_cn": "SCL 块格式",
+      "description": "Export format for SCL blocks",
+      "description_cn": "SCL 块的导出格式",
+      "enum": ["ExternalSource", "SimaticML", "SimaticSD"],
+      "default": "ExternalSource"
+    },
+    "stlFormat": {
+      "type": "string",
+      "title": "STL Block Format",
+      "title_cn": "STL 块格式",
+      "description": "Export format for STL blocks",
+      "description_cn": "STL 块的导出格式",
+      "enum": ["ExternalSource", "SimaticML"],
+      "default": "ExternalSource"
+    },
+    "ladFormat": {
+      "type": "string",
+      "title": "LAD Block Format",
+      "title_cn": "LAD 块格式",
+      "description": "Export format for LAD (ladder logic) blocks",
+      "description_cn": "LAD（梯形逻辑）块的导出格式",
+      "enum": ["SimaticML", "SimaticSD"],
+      "default": "SimaticML"
+    },
+    "dbFormat": {
+      "type": "string",
+      "title": "DB Block Format",
+      "title_cn": "DB 块格式",
+      "description": "Export format for Data Blocks",
+      "description_cn": "数据块的导出格式",
+      "enum": ["ExternalSource", "SimaticML", "SimaticSD"],
+      "default": "ExternalSource"
+    },
+    "udtFormat": {
+      "type": "string",
+      "title": "UDT Format",
+      "title_cn": "UDT 格式",
+      "description": "Export format for User Defined Types",
+      "description_cn": "用户定义类型的导出格式",
+      "enum": ["ExternalSource", "SimaticML", "SimaticSD"],
+      "default": "ExternalSource"
+    },
+    "safetyDbFormat": {
+      "type": "string",
+      "title": "Safety DB Format",
+      "title_cn": "安全 DB 格式",
+      "description": "Export format for Safety Data Blocks",
+      "description_cn": "安全数据块的导出格式",
+      "enum": ["SimaticML", "SimaticSD"],
+      "default": "SimaticML"
+    },
+    "safetyUdtFormat": {
+      "type": "string",
+      "title": "Safety UDT Format",
+      "title_cn": "安全 UDT 格式",
+      "description": "Export format for Safety UDTs",
+      "description_cn": "安全 UDT 的导出格式",
+      "enum": ["SimaticML", "SimaticSD"],
+      "default": "SimaticML"
+    },
+    "umacUser": {
+      "type": "string",
+      "title": "UMAC User",
+      "title_cn": "UMAC 用户",
+      "description": "UMAC local user name for password-protected projects",
+      "description_cn": "用于密码保护项目的 UMAC 本地用户名"
+    },
+    "umacPassword": {
+      "type": "string",
+      "title": "UMAC Password",
+      "title_cn": "UMAC 密码",
+      "description": "UMAC local user password for password-protected projects",
+      "description_cn": "用于密码保护项目的 UMAC 本地用户密码"
+    },
+    "portalMode": {
+      "type": "string",
+      "title": "TIA Portal Mode",
+      "title_cn": "TIA Portal 模式",
+      "description": "Whether to show the TIA Portal user interface during export",
+      "description_cn": "导出时是否显示 TIA Portal 用户界面",
+      "enum": ["WithoutUserInterface", "WithUserInterface"],
+      "default": "WithoutUserInterface"
+    },
+    "logfile": {
+      "type": "string",
+      "title": "Log File Path",
+      "title_cn": "日志文件路径",
+      "description": "Write detailed logs to this file",
+      "description_cn": "将详细日志写入此文件"
+    },
+    "loglevel": {
+      "type": "string",
+      "title": "Log Level",
+      "title_cn": "日志级别",
+      "description": "Minimum log level for console and file output",
+      "description_cn": "控制台和文件输出的最低日志级别",
+      "enum": ["debug", "info", "warn", "error"],
+      "default": "info"
+    }
+  }
+}

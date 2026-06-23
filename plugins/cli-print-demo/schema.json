@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CLI Print Demo",
+  "title_cn": "CLI 打印演示",
+  "description": "Playground demonstrating all RJSF widget types — fill in the form and see how arguments are built and passed to cli-print.exe",
+  "description_cn": "展示所有 RJSF 控件类型的演示表单 — 填写表单，观察参数如何构建并传递给 cli-print.exe",
+  "type": "object",
+  "required": ["textInput"],
+  "properties": {
+    "textInput": {
+      "type": "string",
+      "title": "Text Input",
+      "title_cn": "文本输入",
+      "description": "Basic single-line text input (string, no format). Maps to positional argument.",
+      "description_cn": "基本单行文本输入。映射为位置参数。",
+      "default": "hello world"
+    },
+    "textArea": {
+      "type": "string",
+      "title": "Text Area",
+      "title_cn": "文本区域",
+      "description": "Multiline text input (ui:widget: textarea). Maps to --textarea option.",
+      "description_cn": "多行文本输入。映射为 --textarea 选项。"
+    },
+    "password": {
+      "type": "string",
+      "format": "password",
+      "title": "Password",
+      "title_cn": "密码",
+      "description": "Password field (ui:options: { inputType: 'password' }). Maps to --password option.",
+      "description_cn": "密码输入字段。映射为 --password 选项。"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email",
+      "title_cn": "电子邮件",
+      "description": "Email input (format: email). Maps to --email option.",
+      "description_cn": "电子邮件输入。映射为 --email 选项。",
+      "default": "user@example.com"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "title": "URL",
+      "title_cn": "网址",
+      "description": "URL input (format: uri). Maps to --url option.",
+      "description_cn": "网址输入。映射为 --url 选项。",
+      "default": "https://example.com"
+    },
+    "fileInput": {
+      "type": "string",
+      "title": "File Input",
+      "title_cn": "文件输入",
+      "description": "File picker using local custom widget. Maps to --file option.",
+      "description_cn": "本地自定义文件选择器。映射为 --file 选项。"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "title": "Date",
+      "title_cn": "日期",
+      "description": "Date picker (format: date). Maps to --date option.",
+      "description_cn": "日期选择。映射为 --date 选项。"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Date Time",
+      "title_cn": "日期时间",
+      "description": "Date-time picker (format: date-time). Maps to --date-time option.",
+      "description_cn": "日期时间选择。映射为 --date-time 选项。"
+    },
+    "time": {
+      "type": "string",
+      "format": "time",
+      "title": "Time",
+      "title_cn": "时间",
+      "description": "Time picker (format: time). Maps to --time option.",
+      "description_cn": "时间选择。映射为 --time 选项。"
+    },
+    "color": {
+      "type": "string",
+      "format": "color",
+      "title": "Color",
+      "title_cn": "颜色",
+      "description": "Color picker (format: color / ui:widget: color). Maps to --color option.",
+      "description_cn": "颜色选择器。映射为 --color 选项。",
+      "default": "#3b82f6"
+    },
+    "number": {
+      "type": "number",
+      "title": "Number (float)",
+      "title_cn": "数字（浮点数）",
+      "description": "Floating-point number field (type: number). Maps to positional argument.",
+      "description_cn": "浮点数输入。映射为位置参数。",
+      "default": 3.14,
+      "minimum": -9999,
+      "maximum": 9999
+    },
+    "integer": {
+      "type": "integer",
+      "title": "Integer",
+      "title_cn": "整数",
+      "description": "Integer number field (type: integer). Maps to positional argument.",
+      "description_cn": "整数输入。映射为位置参数。",
+      "default": 42,
+      "minimum": 0,
+      "maximum": 99999
+    },
+    "rangeNum": {
+      "type": "integer",
+      "title": "Range Slider",
+      "title_cn": "范围滑块",
+      "description": "Range slider (ui:widget: range). Maps to --range option.",
+      "description_cn": "范围滑块。映射为 --range 选项。",
+      "default": 50,
+      "minimum": 0,
+      "maximum": 100
+    },
+    "booleanCheck": {
+      "type": "boolean",
+      "title": "Boolean Checkbox",
+      "title_cn": "布尔复选框",
+      "description": "Boolean checkbox (default boolean widget). Maps to --enabled switch.",
+      "description_cn": "布尔复选框。映射为 --enabled 开关。",
+      "default": true
+    },
+    "booleanRadio": {
+      "type": "boolean",
+      "title": "Boolean Radio",
+      "title_cn": "布尔单选",
+      "description": "Boolean radio (ui:widget: radio). Maps to --agree switch.",
+      "description_cn": "布尔单选按钮。映射为 --agree 开关。",
+      "default": false
+    },
+    "enumSelect": {
+      "type": "string",
+      "title": "Enum Select",
+      "title_cn": "枚举选择",
+      "description": "Dropdown select from enum values. Maps to --mode option.",
+      "description_cn": "下拉枚举选择。映射为 --mode 选项。",
+      "enum": ["auto", "manual", "scheduled", "triggered"],
+      "default": "auto"
+    },
+    "enumRadio": {
+      "type": "string",
+      "title": "Enum Radio",
+      "title_cn": "枚举单选",
+      "description": "Radio button group from enum (ui:widget: radio). Maps to --color-mode option.",
+      "description_cn": "枚举单选按钮组。映射为 --color-mode 选项。",
+      "enum": ["light", "dark", "sepia", "solarized"],
+      "default": "dark"
+    },
+    "arrayEnum": {
+      "type": "array",
+      "title": "Array — Checkboxes",
+      "title_cn": "数组 — 复选框",
+      "description": "Checkbox group from enum items (default array widget for string enums). Maps to multiple positional arguments (argument-array).",
+      "description_cn": "枚举项复选框组。映射为多个位置参数 (argument-array)。",
+      "items": {
+        "type": "string",
+        "enum": ["alpha", "beta", "gamma", "delta"]
+      },
+      "uniqueItems": true
+    },
+    "arrayMulti": {
+      "type": "array",
+      "title": "Array — Multi-Select",
+      "title_cn": "数组 — 多选",
+      "description": "Multi-select dropdown (ui:widget: select for array). Maps to repeated --tags option.",
+      "description_cn": "多选下拉框。映射为重复的 --tags 选项。",
+      "items": {
+        "type": "string",
+        "enum": ["frontend", "backend", "devops", "data", "security"]
+      },
+      "uniqueItems": true
+    },
+    "singleSelect": {
+      "type": "string",
+      "title": "Single Select (anyOf)",
+      "title_cn": "单选（anyOf）",
+      "description": "Dropdown from anyOf alternatives. Maps to --choice option.",
+      "description_cn": "anyOf 备选下拉框。映射为 --choice 选项。",
+      "anyOf": [
+        { "type": "string", "title": "String", "title_cn": "字符串", "default": "default" },
+        { "type": "number", "title": "Number", "title_cn": "数字" },
+        { "type": "boolean", "title": "Boolean", "title_cn": "布尔" }
+      ],
+      "default": "default"
+    },
+    "nestedName": {
+      "type": "string",
+      "title": "Nested — Name",
+      "title_cn": "嵌套 — 名称",
+      "description": "Name field within an object group. Maps to --name option.",
+      "description_cn": "对象组中的名称字段。映射为 --name 选项。",
+      "default": "John"
+    },
+    "nestedAge": {
+      "type": "integer",
+      "title": "Nested — Age",
+      "title_cn": "嵌套 — 年龄",
+      "description": "Age field within an object group. Maps to --age option.",
+      "description_cn": "对象组中的年龄字段。映射为 --age 选项。",
+      "default": 30,
+      "minimum": 0,
+      "maximum": 150
+    },
+    "hiddenField": {
+      "type": "string",
+      "title": "Hidden Field",
+      "title_cn": "隐藏字段",
+      "description": "Hidden input (ui:widget: hidden). Injected via form default. Maps to --secret option.",
+      "description_cn": "隐藏输入。通过表单默认值注入。映射为 --secret 选项。",
+      "default": "hidden-value"
+    }
+  }
+}
