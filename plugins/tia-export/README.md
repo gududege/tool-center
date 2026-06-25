@@ -9,6 +9,10 @@ A command-line tool that exports content from **Siemens TIA Portal** projects us
 - **Parallel processing** — configurable worker count for concurrent project export
 - **Flexible output formats** — SimaticML, ExternalSource (SCL/AWL/DB), SimaticSD
 - **Folder structure** — optionally preserve the original TIA Portal group hierarchy
+- **Incremental update** — re-export only specific types without clearing other output (`--incremental-update`)
+- **Export statistics** — per-PLC, per-type success/failure counts recorded in `manifest.json`
+- **Enum validation** — invalid option values produce a clear error and exit code 1
+- **Graceful shutdown** — Ctrl+C immediately releases TIA Portal and aborts remaining operations
 - **UMAC authentication** — support for password-protected projects
 - **Safety blocks** — dedicated format options for Safety blocks and UDTs
 
@@ -39,6 +43,7 @@ Options:
   --loglevel <LEVEL>      Minimum log level: debug, info, warn, error
   --portal-mode <MODE>    WithoutUserInterface (default) or WithUserInterface
   --keep-folder-structure  Preserve TIA Portal group hierarchy in output
+  --incremental-update     Do not delete other export types' output; only overwrite matching types
   --export-mode <MODE>    Comma-separated: hardware, block, tag, udt, watchtable, reference, all (default)
   --max-workers <N>       Maximum parallel workers (default: auto)
   --project-filter <REGEX> Regex filter for project names
@@ -97,6 +102,52 @@ outdir/
 ```
 
 With `--keep-folder-structure`, the TIA Portal group hierarchy is preserved as nested directories inside each block type folder.
+
+### manifest.json
+
+Each project folder contains a `manifest.json` with export metadata and per-PLC, per-type statistics:
+
+```json
+{
+  "ProjectName": "MyProject",
+  "TiaVersion": "V19",
+  "ExportTime": "2026-06-24T12:00:00.0000000Z",
+  "ExporterVersion": "1.0.0",
+  "Plcs": ["PLC_1", "PLC_2"],
+  "HardwareExport": {
+    "ExportType": "hardware",
+    "ExportTime": "2026-06-24T12:00:00.0000000Z",
+    "SuccessCount": 1,
+    "FailureCount": 0
+  },
+  "PlcExports": [
+    {
+      "PlcName": "PLC_1",
+      "Results": [
+        { "ExportType": "blocks", "ExportTime": "...", "SuccessCount": 42, "FailureCount": 0 },
+        { "ExportType": "tags", "ExportTime": "...", "SuccessCount": 5, "FailureCount": 0 },
+        { "ExportType": "udts", "ExportTime": "...", "SuccessCount": 12, "FailureCount": 1 },
+        { "ExportType": "watchtables", "ExportTime": "...", "SuccessCount": 2, "FailureCount": 0 },
+        { "ExportType": "references", "ExportTime": "...", "SuccessCount": 38, "FailureCount": 0 }
+      ]
+    }
+  ]
+}
+```
+
+## Use with --incremental-update
+
+Re-export specific types without clearing previously exported content:
+
+```shell
+# Initial full export
+tia-export.exe --indir D:\Projects --outdir D:\Exports
+
+# Later: re-export only UDTs, keep blocks/tags/etc. intact
+tia-export.exe --indir D:\Projects --outdir D:\Exports --export-mode udt --incremental-update
+```
+
+In incremental mode, only the folders/files corresponding to the selected `--export-mode` are replaced; all other export types' output is preserved.
 
 ## Exit Codes
 

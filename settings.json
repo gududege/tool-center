@@ -1,0 +1,15 @@
+{
+  "Theme": "light",
+  "FormTheme": "default",
+  "PluginDirectory": "../../plugins",
+  "MaxOutputLines": 0,
+  "MaxTaskHistory": 0,
+  "AutoReloadPlugins": false,
+  "Language": "en",
+  "SidebarCollapsed": false,
+  "SidebarSize": 20,
+  "BottomPanelSize": 30,
+  "BottomTab": "tasks",
+  "WindowWidth": 1409,
+  "WindowHeight": 1045
+}

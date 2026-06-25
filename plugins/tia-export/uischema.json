@@ -37,6 +37,10 @@
         },
         {
           "type": "Control",
+          "scope": "#/properties/incrementalUpdate"
+        },
+        {
+          "type": "Control",
           "scope": "#/properties/maxWorkers"
         },
         {

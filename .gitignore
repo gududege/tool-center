@@ -75,6 +75,7 @@ secrets/
 # Runtime / Generated files
 # ============================================
 plugins/**/history.json
+!/plugins/**/*.exe
 *.db
 *.sqlite
 *.sqlite3

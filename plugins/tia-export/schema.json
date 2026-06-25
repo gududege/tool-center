@@ -9,7 +9,6 @@
   "properties": {
     "indir": {
       "type": "string",
-      "format": "data-url",
       "title": "Input Directory",
       "title_cn": "输入目录",
       "description": "Directory containing TIA Portal project files (.ap17–.ap20, .zap17–.zap20)",
@@ -17,7 +16,6 @@
     },
     "outdir": {
       "type": "string",
-      "format": "data-url",
       "title": "Output Directory",
       "title_cn": "输出目录",
       "description": "Directory where exported files will be saved",
@@ -41,6 +39,14 @@
       "title_cn": "保留文件夹结构",
       "description": "Preserve the original TIA Portal group hierarchy in the output",
       "description_cn": "在输出中保留原始 TIA Portal 组层次结构",
+      "default": false
+    },
+    "incrementalUpdate": {
+      "type": "boolean",
+      "title": "Incremental Update",
+      "title_cn": "增量更新",
+      "description": "Only overwrite matching types",
+      "description_cn": "仅覆盖匹配的类型",
       "default": false
     },
     "maxWorkers": {
