@@ -48,15 +48,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_VERSION }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -69,14 +69,14 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Build frontend
         working-directory: frontend
         run: npm ci && npm run build
 
       - name: Build Wails binary
-        run: wails build -platform ${{ matrix.platform }} -ldflags "-w -s -X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }}"
+        run: wails build -tags webkit2_41 -platform ${{ matrix.platform }} -ldflags "-w -s -X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }}"
 
       - name: Package artifact (Windows)
         if: matrix.package == 'zip' && runner.os == 'Windows'
@@ -99,7 +99,7 @@ jobs:
           tar -czf dist/${{ matrix.artifact }}.tar.gz -C build/bin .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: dist/*
@@ -112,10 +112,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           pattern: cli-tool-center-*
@@ -125,7 +125,7 @@ jobs:
         run: ls -lah dist
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           generate_release_notes: true

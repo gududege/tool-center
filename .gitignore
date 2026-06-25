@@ -8,7 +8,7 @@
 *.dylib
 *.test
 *.out
-vendor/
+/vendor/
 
 # ============================================
 # Node.js / Frontend
@@ -32,6 +32,10 @@ frontend/build/
 
 # Wails
 build/bin/
+build/*.ico
+build/**/*.ico
+build/**/*.syso
+build/**/*.rc
 
 # ============================================
 # IDE / Editor
