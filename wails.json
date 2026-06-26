@@ -7,7 +7,14 @@
   "frontend:dev:watcher": "npm run dev",
   "frontend:dev:serverUrl": "http://localhost:5173",
   "author": {
-    "name": "cli-tool-center",
-    "email": "dev@cli-tool-center.com"
+    "name": "gududege",
+    "email": "gududege@github"
+  },
+  "info": {
+    "companyName": "Your Company",
+    "productName": "CLI Tool Center",
+    "productVersion": "0.0.1",
+    "copyright": "Copyright © 2026 Your Company",
+    "comments": "A tool center for CLI tools"
   }
 }

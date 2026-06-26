@@ -36,11 +36,6 @@ jobs:
             artifact: cli-tool-center-linux-amd64
             package: tar.gz
 
-          - os: macos-13
-            platform: darwin/amd64
-            artifact: cli-tool-center-darwin-amd64
-            package: zip
-
           - os: macos-latest
             platform: darwin/arm64
             artifact: cli-tool-center-darwin-arm64
@@ -77,6 +72,39 @@ jobs:
 
       - name: Build Wails binary
         run: wails build -tags webkit2_41 -platform ${{ matrix.platform }} -ldflags "-w -s -X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }}"
+
+      - name: Build cli-print tool and copy files to build/bin
+        shell: bash
+        run: |
+          cli_print_binary="cli-print"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cli_print_binary="cli-print.exe"
+          fi
+          go build -o "plugins/cli-print-demo/${cli_print_binary}" ./tool/cli-print/
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            cp -r plugins build/bin/
+          else
+            cp -r plugins/cli-print-demo build/bin/
+          fi
+          cp -r docs build/bin/
+
+      - name: Install UPX (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y upx
+
+      - name: Install UPX (Windows)
+        if: runner.os == 'Windows'
+        run: choco install upx --no-progress
+
+      - name: Compress binary with UPX
+        if: runner.os != 'macOS'
+        shell: bash
+        run: |
+          binary_name="cli-tool-center"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            binary_name="cli-tool-center.exe"
+          fi
+          upx "build/bin/${binary_name}"
 
       - name: Package artifact (Windows)
         if: matrix.package == 'zip' && runner.os == 'Windows'
