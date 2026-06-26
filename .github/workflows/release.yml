@@ -81,11 +81,8 @@ jobs:
             cli_print_binary="cli-print.exe"
           fi
           go build -o "plugins/cli-print-demo/${cli_print_binary}" ./tool/cli-print/
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cp -r plugins build/bin/
-          else
-            cp -r plugins/cli-print-demo build/bin/
-          fi
+          mkdir -p build/bin/plugins
+          cp -r plugins/* build/bin/plugins/
           cp -r docs build/bin/
 
       - name: Install UPX (Linux)
@@ -111,14 +108,19 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist
-          $files = Get-ChildItem -Path build/bin -Recurse
-          Compress-Archive -Path $files.FullName -DestinationPath dist/${{ matrix.artifact }}.zip
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::CreateFromDirectory(
+            (Resolve-Path build/bin).Path,
+            "dist/${{ matrix.artifact }}.zip",
+            [System.IO.Compression.CompressionLevel]::Optimal,
+            $false
+          )
 
       - name: Package artifact (macOS)
         if: matrix.package == 'zip' && runner.os == 'macOS'
         run: |
           mkdir -p dist
-          ditto -c -k --keepParent build/bin dist/${{ matrix.artifact }}.zip
+          ditto -c -k build/bin dist/${{ matrix.artifact }}.zip
 
       - name: Package artifact (Linux)
         if: matrix.package == 'tar.gz'
