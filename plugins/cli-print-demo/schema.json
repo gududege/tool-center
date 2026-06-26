@@ -214,6 +214,62 @@
       "description": "Hidden input (ui:widget: hidden). Injected via form default. Maps to --secret option.",
       "description_cn": "隐藏输入。通过表单默认值注入。映射为 --secret 选项。",
       "default": "hidden-value"
+    },
+    "folderInput": {
+      "type": "string",
+      "title": "Folder Picker",
+      "title_cn": "目录选择器",
+      "description": "Directory selection dialog (options: { folderPicker: true }). Maps to --folder option.",
+      "description_cn": "目录选择对话框。映射为 --folder 选项。",
+      "default": ""
+    },
+    "saveFileOutput": {
+      "type": "string",
+      "title": "Save File Picker",
+      "title_cn": "保存文件选择器",
+      "description": "Save file dialog (options: { saveFilePicker: true }). Maps to --out option.",
+      "description_cn": "保存文件对话框。映射为 --out 选项。",
+      "default": ""
+    },
+    "boolOptionFlag": {
+      "type": "boolean",
+      "title": "Bool Option",
+      "title_cn": "布尔选项",
+      "description": "Boolean with bool-option mapping: always outputs --verbose true/false.",
+      "description_cn": "布尔映射为 bool-option：始终输出 --verbose true/false。",
+      "default": true
+    },
+    "enableFeature": {
+      "type": "boolean",
+      "title": "Dual Switch",
+      "title_cn": "双开关",
+      "description": "Boolean with dual-switch mapping: --enable when true, --disable when false.",
+      "description_cn": "布尔映射为 dual-switch：true 时输出 --enable，false 时输出 --disable。",
+      "default": false
+    },
+    "tagsJoin": {
+      "type": "array",
+      "title": "Tags — Join Style",
+      "title_cn": "标签 — Join 风格",
+      "description": "Option-array with join style: --tags a,b,c. Maps to repeated --tag option (join style).",
+      "description_cn": "option-array join 风格：--tags a,b,c。",
+      "items": {
+        "type": "string",
+        "enum": ["alpha", "beta", "gamma", "delta"]
+      },
+      "uniqueItems": true
+    },
+    "configEquals": {
+      "type": "array",
+      "title": "Config — Equals Style",
+      "title_cn": "配置 — Equals 风格",
+      "description": "Option-array with equals style: --config=a,b,c. Maps to --config option (equals style).",
+      "description_cn": "option-array equals 风格：--config=a,b,c。",
+      "items": {
+        "type": "string",
+        "enum": ["option1", "option2", "option3"]
+      },
+      "uniqueItems": true
     }
   }
 }

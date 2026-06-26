@@ -14,11 +14,44 @@
         },
         { "type": "Control", "scope": "#/properties/password" },
         { "type": "Control", "scope": "#/properties/email" },
-        { "type": "Control", "scope": "#/properties/url" },
+        { "type": "Control", "scope": "#/properties/url" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Horizontal Layout Demo",
+      "label_cn": "水平布局演示",
+      "description": "Fields rendered side by side using HorizontalLayout",
+      "description_cn": "使用 HorizontalLayout 水平排列字段",
+      "elements": [
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            { "type": "Control", "scope": "#/properties/textInput" },
+            { "type": "Control", "scope": "#/properties/number" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Pickers (Custom Widgets)",
+      "label_cn": "选择器（自定义控件）",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/folderInput",
+          "options": { "folderPicker": true }
+        },
         {
           "type": "Control",
           "scope": "#/properties/fileInput",
           "options": { "filePicker": true }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/saveFileOutput",
+          "options": { "saveFilePicker": true }
         }
       ]
     },
@@ -57,6 +90,16 @@
           "type": "Control",
           "scope": "#/properties/booleanRadio",
           "options": { "widget": "radio" }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/boolOptionFlag",
+          "description": "Maps to bool-option: always outputs --verbose true/false"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/enableFeature",
+          "description": "Maps to dual-switch: --enable when true, --disable when false"
         }
       ]
     },
@@ -84,20 +127,42 @@
           "type": "Control",
           "scope": "#/properties/arrayMulti",
           "options": { "widget": "select" }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/tagsJoin",
+          "description": "Option-array with join style: --tags a,b,c"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/configEquals",
+          "description": "Option-array with equals style: --config=a,b,c"
         }
       ]
     },
     {
-      "type": "Group",
-      "label": "Other Widgets",
-      "label_cn": "其他控件",
+      "type": "Categorization",
       "elements": [
-        { "type": "Control", "scope": "#/properties/nestedName" },
-        { "type": "Control", "scope": "#/properties/nestedAge" },
         {
-          "type": "Control",
-          "scope": "#/properties/hiddenField",
-          "options": { "widget": "hidden" }
+          "type": "Category",
+          "label": "Misc",
+          "label_cn": "其他",
+          "elements": [
+            {
+              "type": "Group",
+              "label": "Other Widgets",
+              "label_cn": "其他控件",
+              "elements": [
+                { "type": "Control", "scope": "#/properties/nestedName" },
+                { "type": "Control", "scope": "#/properties/nestedAge" },
+                {
+                  "type": "Control",
+                  "scope": "#/properties/hiddenField",
+                  "options": { "widget": "hidden" }
+                }
+              ]
+            }
+          ]
         }
       ]
     }

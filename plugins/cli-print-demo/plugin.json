@@ -4,8 +4,8 @@
   "id": "cli-print-demo",
   "name": "CLI Print Demo",
   "name_cn": "CLI 打印演示",
-  "description": "A comprehensive demo plugin showcasing all RJSF widget types. Each form field maps to a CLI argument and is printed by cli-print.exe.",
-  "description_cn": "展示所有 RJSF 控件类型的演示插件。每个表单字段映射到 CLI 参数，由 cli-print.exe 打印输出。",
+  "description": "Comprehensive demo covering all RJSF widgets, custom pickers, HorizontalLayout, Categorization, and all parameter kinds (argument/option/switch/bool-option/dual-switch/option-array with repeat/join/equals). Each form field maps to a CLI argument and is printed by cli-print.exe.",
+  "description_cn": "覆盖所有 RJSF 控件、自定义选择器、HorizontalLayout、Categorization 及全部参数类型（argument/option/switch/bool-option/dual-switch/option-array repeat/join/equals）的完整演示。每个表单字段映射到 CLI 参数，由 cli-print.exe 打印输出。",
   "version": "1.0.0",
   "author": "CLI Tool Center",
   "icon": "",
@@ -40,10 +40,16 @@
       { "field": "enumRadio",    "kind": "option",   "flag": "--color-mode" },
       { "field": "arrayEnum",    "kind": "argument-array" },
       { "field": "arrayMulti",   "kind": "option-array", "flag": "--tags", "style": "repeat" },
-      { "field": "hiddenField",  "kind": "option",   "flag": "--secret" },
-      { "field": "singleSelect", "kind": "option",   "flag": "--choice" },
-      { "field": "nestedName",   "kind": "option",   "flag": "--name" },
-      { "field": "nestedAge",    "kind": "option",   "flag": "--age" }
+      { "field": "hiddenField",    "kind": "option",         "flag": "--secret" },
+      { "field": "singleSelect",   "kind": "option",         "flag": "--choice" },
+      { "field": "nestedName",     "kind": "option",         "flag": "--name" },
+      { "field": "nestedAge",      "kind": "option",         "flag": "--age" },
+      { "field": "folderInput",    "kind": "option",         "flag": "--folder" },
+      { "field": "saveFileOutput", "kind": "option",         "flag": "--out" },
+      { "field": "boolOptionFlag", "kind": "bool-option",    "flag": "--verbose" },
+      { "field": "enableFeature",  "kind": "dual-switch",    "trueFlag": "--enable",  "falseFlag": "--disable" },
+      { "field": "tagsJoin",       "kind": "option-array",   "flag": "--tags",  "style": "join",   "separator": "," },
+      { "field": "configEquals",   "kind": "option-array",   "flag": "--config", "style": "equals", "separator": "," }
     ]
   },
   "output": {
