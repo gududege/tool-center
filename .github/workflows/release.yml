@@ -73,16 +73,13 @@ jobs:
       - name: Build Wails binary
         run: wails build -tags webkit2_41 -platform ${{ matrix.platform }} -ldflags "-w -s -X main.version=${{ github.ref_name }} -X main.commit=${{ github.sha }}"
 
-      - name: Build cli-print tool and copy files to build/bin
+      - name: Stage platform plugins and docs
         shell: bash
         run: |
-          cli_print_binary="cli-print"
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            cli_print_binary="cli-print.exe"
-          fi
-          go build -o "plugins/cli-print-demo/${cli_print_binary}" ./tool/cli-print/
+          platform_dir=$(echo "${{ matrix.platform }}" | tr '/' '-')
           mkdir -p build/bin/plugins
-          cp -r plugins/* build/bin/plugins/
+          cp -r "plugins/${platform_dir}/." build/bin/plugins/
+          cp "plugins/plugin.schema.json" build/bin/plugins/
           cp -r docs build/bin/
 
       - name: Install UPX (Linux)

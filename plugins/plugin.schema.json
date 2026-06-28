@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/plugin.schema.json",
+  "title": "CLI Tool Center Plugin",
+  "description": "插件主配置文件 schema。所有插件目录下必须包含一个 plugin.json，且符合此 schema。",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "navigation",
+    "execution"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "指向本 schema 的路径，仅用于 IDE 提示和校验。"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "description": "插件规范版本，当前固定为 1.0。",
+      "enum": ["1.0"]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9._-]+$",
+      "description": "插件唯一标识，只能包含字母、数字、点、下划线和连字符。"
+    },
+    "name": {
+      "type": "string",
+      "description": "插件英文显示名称。"
+    },
+    "name_cn": {
+      "type": "string",
+      "description": "插件中文显示名称（可选）。"
+    },
+    "description": {
+      "type": "string",
+      "description": "插件英文描述。"
+    },
+    "description_cn": {
+      "type": "string",
+      "description": "插件中文描述（可选）。"
+    },
+    "version": {
+      "type": "string",
+      "description": "插件版本号，建议 SemVer。"
+    },
+    "author": {
+      "type": "string",
+      "description": "插件作者。"
+    },
+    "homepage": {
+      "type": "string",
+      "description": "插件主页或仓库地址（可选）。"
+    },
+    "icon": {
+      "type": "string",
+      "description": "图标路径，支持 svg / png / ico，相对插件目录。"
+    },
+    "navigation": {
+      "type": "object",
+      "description": "定义插件在左侧导航树中的位置。",
+      "required": ["group"],
+      "properties": {
+        "group": {
+          "type": "array",
+          "description": "导航分组路径，每一项对应一级菜单。",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "group_cn": {
+          "type": "array",
+          "description": "中文导航分组路径（可选）。",
+          "items": {
+            "type": "string"
+          }
+        },
+        "order": {
+          "type": "integer",
+          "description": "同组内排序，数值越小越靠前。",
+          "default": 0
+        }
+      }
+    },
+    "form": {
+      "type": "object",
+      "description": "表单定义。",
+      "required": ["schema"],
+      "properties": {
+        "schema": {
+          "type": "string",
+          "description": "schema.json 文件路径，相对插件目录。"
+        },
+        "uischema": {
+          "type": "string",
+          "description": "uischema.json 文件路径，相对插件目录（可选）。"
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "description": "CLI 执行配置。",
+      "required": ["exe"],
+      "properties": {
+        "exe": {
+          "type": "string",
+          "description": "可执行文件路径，相对插件目录或绝对路径。"
+        },
+        "workingDirectory": {
+          "type": "string",
+          "description": "工作目录（可选），默认为插件目录。"
+        },
+        "environment": {
+          "type": "object",
+          "description": "额外环境变量。",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "parameters": {
+          "type": "array",
+          "description": "表单字段到 CLI 参数的映射列表。",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "输出配置（可选）。",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["text", "json", "structured"],
+          "default": "text",
+          "description": "输出类型提示。"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "能力标签（可选）。",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "description": "单个表单字段到 CLI 参数的映射。",
+      "required": ["field", "kind"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "schema.json 中的字段名。"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "argument",
+            "argument-array",
+            "option",
+            "option-array",
+            "switch",
+            "bool-option",
+            "dual-switch"
+          ],
+          "description": "参数类型。"
+        },
+        "flag": {
+          "type": "string",
+          "description": "选项/开关的前置标志，如 --project 或 -i。"
+        },
+        "trueFlag": {
+          "type": "string",
+          "description": "dual-switch 为 true 时输出的标志。"
+        },
+        "falseFlag": {
+          "type": "string",
+          "description": "dual-switch 为 false 时输出的标志。"
+        },
+        "style": {
+          "type": "string",
+          "enum": ["repeat", "join", "equals"],
+          "description": "option-array 的输出风格。"
+        },
+        "separator": {
+          "type": "string",
+          "description": "join/equals 风格下的分隔符，默认逗号。"
+        },
+        "order": {
+          "type": "integer",
+          "description": "参数输出顺序（可选），默认按定义顺序。"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TCPING",
+  "title_cn": "TCPING",
+  "description": "Ping a TCP port to monitor network connectivity and latency",
+  "description_cn": "Ping TCP 端口以监控网络连接和延迟",
+  "type": "object",
+  "required": ["host", "port"],
+  "properties": {
+    "host": {
+      "type": "string",
+      "title": "Hostname or IP",
+      "title_cn": "主机名或 IP",
+      "description": "Target hostname, IPv4, or IPv6 address. Supports host:port format (e.g. example.com:443)",
+      "description_cn": "目标主机名、IPv4 或 IPv6 地址。支持 host:port 格式（如 example.com:443）"
+    },
+    "port": {
+      "type": "integer",
+      "title": "Port",
+      "title_cn": "端口",
+      "description": "TCP port number on the target",
+      "description_cn": "目标 TCP 端口号",
+      "minimum": 1,
+      "maximum": 65535,
+      "default": 80
+    },
+    "interval": {
+      "type": "number",
+      "title": "Interval (seconds)",
+      "title_cn": "间隔（秒）",
+      "description": "Interval between sending probes. Real number allowed with dot as decimal separator",
+      "description_cn": "发送探测包的时间间隔。支持小数（点号作为小数点分隔符）",
+      "minimum": 0.1,
+      "maximum": 86400,
+      "default": 1
+    },
+    "timeout": {
+      "type": "number",
+      "title": "Timeout (seconds)",
+      "title_cn": "超时（秒）",
+      "description": "Time to wait for a response. 0 means infinite timeout",
+      "description_cn": "等待响应的超时时间。0 表示无限超时",
+      "minimum": 0,
+      "maximum": 86400,
+      "default": 5
+    },
+    "maxProbes": {
+      "type": "integer",
+      "title": "Max Probes",
+      "title_cn": "最大探测数",
+      "description": "Stop after this many probes regardless of result. 0 means no limit",
+      "description_cn": "达到此探测次数后停止，无论结果如何。0 表示无限制",
+      "minimum": 0,
+      "maximum": 999999
+    },
+    "retryResolve": {
+      "type": "integer",
+      "title": "Retry DNS Resolution",
+      "title_cn": "DNS 重试解析",
+      "description": "Retry resolving hostname after N failed probes. Useful for testing DNS load balancing (GSLB)",
+      "description_cn": "在 N 次探测失败后重新解析主机名。用于测试 DNS 负载均衡 (GSLB)",
+      "minimum": 0,
+      "maximum": 9999,
+      "default": 0
+    },
+    "sourceInterface": {
+      "type": "string",
+      "title": "Source Interface",
+      "title_cn": "源接口",
+      "description": "Network interface name or source IP address to bind to (e.g. eth2, 192.168.1.10)",
+      "description_cn": "要绑定的网络接口名称或源 IP 地址（例如 eth2、192.168.1.10）"
+    },
+    "ipv4Only": {
+      "type": "boolean",
+      "title": "IPv4 Only",
+      "title_cn": "仅 IPv4",
+      "description": "Only resolve and use IPv4 addresses",
+      "description_cn": "仅解析和使用 IPv4 地址",
+      "default": false
+    },
+    "ipv6Only": {
+      "type": "boolean",
+      "title": "IPv6 Only",
+      "title_cn": "仅 IPv6",
+      "description": "Only resolve and use IPv6 addresses",
+      "description_cn": "仅解析和使用 IPv6 地址",
+      "default": false
+    },
+    "showTimestamp": {
+      "type": "boolean",
+      "title": "Show Timestamp",
+      "title_cn": "显示时间戳",
+      "description": "Display date and time in probe output",
+      "description_cn": "在探测输出中显示日期和时间",
+      "default": false
+    },
+    "noColor": {
+      "type": "boolean",
+      "title": "No Color",
+      "title_cn": "无颜色",
+      "description": "Disable ANSI colorized output",
+      "description_cn": "禁用 ANSI 彩色输出",
+      "default": false
+    },
+    "showFailuresOnly": {
+      "type": "boolean",
+      "title": "Show Failures Only",
+      "title_cn": "仅显示失败",
+      "description": "Only display failed probes, omit successes",
+      "description_cn": "仅显示失败的探测，隐藏成功的",
+      "default": false
+    },
+    "showSourceAddress": {
+      "type": "boolean",
+      "title": "Show Source Address",
+      "title_cn": "显示源地址",
+      "description": "Display the source IP address and port used for probes",
+      "description_cn": "显示用于探测的源 IP 地址和端口",
+      "default": false
+    },
+    "jsonOutput": {
+      "type": "boolean",
+      "title": "JSON Output",
+      "title_cn": "JSON 输出",
+      "description": "Output probe results in JSON format",
+      "description_cn": "以 JSON 格式输出探测结果",
+      "default": false
+    },
+    "prettyJson": {
+      "type": "boolean",
+      "title": "Pretty JSON",
+      "title_cn": "美化 JSON",
+      "description": "Use indentation for JSON output (requires JSON Output enabled)",
+      "description_cn": "为 JSON 输出使用缩进（需要启用 JSON 输出）",
+      "default": false
+    },
+    "csvPath": {
+      "type": "string",
+      "title": "CSV Output File",
+      "title_cn": "CSV 输出文件",
+      "description": "Save probe results to CSV file. Stats summary saved with _stats suffix",
+      "description_cn": "将探测结果保存到 CSV 文件。统计摘要以 _stats 后缀保存"
+    },
+    "dbPath": {
+      "type": "string",
+      "title": "SQLite Database",
+      "title_cn": "SQLite 数据库",
+      "description": "Save probe results to SQLite database file",
+      "description_cn": "将探测结果保存到 SQLite 数据库文件"
+    },
+    "nonInteractive": {
+      "type": "boolean",
+      "title": "Non-Interactive Mode",
+      "title_cn": "非交互模式",
+      "description": "Run in background mode (e.g. with nohup or as a service)",
+      "description_cn": "以后台模式运行（例如使用 nohup 或作为服务）",
+      "default": false
+    }
+  }
+}

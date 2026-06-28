@@ -75,7 +75,6 @@ secrets/
 # ============================================
 plugins/**/history.json
 !/plugins/**/*.exe
-plugins/cli-print-demo/*.exe
 *.db
 *.sqlite
 *.sqlite3

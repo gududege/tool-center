@@ -1,0 +1,61 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schemaVersion": "1.0",
+  "id": "cli-print-demo",
+  "name": "CLI Print Demo",
+  "name_cn": "CLI 打印演示",
+  "description": "Comprehensive demo covering all RJSF widgets, custom pickers, HorizontalLayout, Categorization, and all parameter kinds (argument/option/switch/bool-option/dual-switch/option-array with repeat/join/equals). Each form field maps to a CLI argument and is printed by cli-print.exe.",
+  "description_cn": "覆盖所有 RJSF 控件、自定义选择器、HorizontalLayout、Categorization 及全部参数类型（argument/option/switch/bool-option/dual-switch/option-array repeat/join/equals）的完整演示。每个表单字段映射到 CLI 参数，由 cli-print.exe 打印输出。",
+  "version": "1.0.0",
+  "author": "CLI Tool Center",
+  "icon": "",
+  "navigation": {
+    "group": ["Demo", "CLI Print"],
+    "group_cn": ["演示", "CLI 打印"],
+    "order": 99
+  },
+  "form": {
+    "schema": "schema.json",
+    "uischema": "uischema.json"
+  },
+  "execution": {
+    "exe": "cli-print.exe",
+    "parameters": [
+      { "field": "textInput",    "kind": "argument" },
+      { "field": "textArea",     "kind": "option",   "flag": "--textarea" },
+      { "field": "password",     "kind": "option",   "flag": "--password" },
+      { "field": "email",        "kind": "option",   "flag": "--email" },
+      { "field": "url",          "kind": "option",   "flag": "--url" },
+      { "field": "fileInput",    "kind": "option",   "flag": "--file" },
+      { "field": "date",         "kind": "option",   "flag": "--date" },
+      { "field": "dateTime",     "kind": "option",   "flag": "--date-time" },
+      { "field": "time",         "kind": "option",   "flag": "--time" },
+      { "field": "color",        "kind": "option",   "flag": "--color" },
+      { "field": "number",       "kind": "argument" },
+      { "field": "integer",      "kind": "argument" },
+      { "field": "rangeNum",     "kind": "option",   "flag": "--range" },
+      { "field": "booleanCheck", "kind": "switch",   "flag": "--enabled" },
+      { "field": "booleanRadio", "kind": "switch",   "flag": "--agree" },
+      { "field": "enumSelect",   "kind": "option",   "flag": "--mode" },
+      { "field": "enumRadio",    "kind": "option",   "flag": "--color-mode" },
+      { "field": "arrayEnum",    "kind": "argument-array" },
+      { "field": "arrayMulti",   "kind": "option-array", "flag": "--tags", "style": "repeat" },
+      { "field": "hiddenField",    "kind": "option",         "flag": "--secret" },
+      { "field": "singleSelect",   "kind": "option",         "flag": "--choice" },
+      { "field": "nestedName",     "kind": "option",         "flag": "--name" },
+      { "field": "nestedAge",      "kind": "option",         "flag": "--age" },
+      { "field": "folderInput",    "kind": "option",         "flag": "--folder" },
+      { "field": "saveFileOutput", "kind": "option",         "flag": "--out" },
+      { "field": "boolOptionFlag", "kind": "bool-option",    "flag": "--verbose" },
+      { "field": "enableFeature",  "kind": "dual-switch",    "trueFlag": "--enable",  "falseFlag": "--disable" },
+      { "field": "tagsJoin",       "kind": "option-array",   "flag": "--tags",  "style": "join",   "separator": "," },
+      { "field": "configEquals",   "kind": "option-array",   "flag": "--config", "style": "equals", "separator": "," }
+    ]
+  },
+  "output": {
+    "type": "text"
+  },
+  "capabilities": [
+    "demo"
+  ]
+}
