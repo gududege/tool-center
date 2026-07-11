@@ -3,7 +3,6 @@
   "app.loading": "加载中...",
 
   "sidebar.title": "插件",
-  "sidebar.search": "搜索...",
   "sidebar.reload": "刷新插件",
   "sidebar.no_plugins": "未加载到插件",
 
@@ -21,18 +20,11 @@
   "form.preview_label": "预览：",
   "form.loading": "正在加载插件...",
   "form.not_found": "未找到插件",
-  "form.no_params": "无需参数",
-  "form.select": "-- 请选择 --",
   "form.error_load": "加载插件失败",
   "form.error_run": "运行插件失败",
   "form.select_directory": "选择目录...",
   "form.select_file": "选择文件...",
   "form.save_file": "保存文件...",
-  "form.email_placeholder": "name@example.com",
-  "form.url_placeholder": "https://example.com",
-  "form.option_fallback": "选项 {index}",
-  "form.comma_separated": "逗号分隔的值",
-  "form.required_field": "此字段为必填项",
 
   "panel.tasks": "任务",
   "panel.output": "输出",
@@ -51,30 +43,13 @@
   "task.status.completed": "已完成",
   "task.status.failed": "失败",
   "task.status.cancelled": "已取消",
-  "task.cancel": "取消",
-  "task.delete": "删除",
 
   "theme.light": "浅色",
   "theme.dark": "深色",
   "theme.system": "跟随系统",
 
-  "common.enabled": "启用",
-  "common.yes": "是",
-  "common.no": "否",
   "common.search": "搜索...",
   "common.language": "语言",
   "common.lang.en": "English",
-  "common.lang.zh": "中文",
-  "common.form_theme": "表单风格",
-
-  "form_theme.default": "默认",
-  "form_theme.caffeine": "咖啡因",
-  "form_theme.claude": "Claude",
-  "form_theme.clean_slate": "纯净",
-  "form_theme.amethyst_haze": "紫水晶",
-  "form_theme.neo_brutalism": "新粗野",
-  "form_theme.pastel_dreams": "粉彩梦境",
-  "form_theme.soft_pop": "柔和流行",
-  "form_theme.twitter": "Twitter",
-  "form_theme.vercel": "Vercel"
+  "common.lang.zh": "中文"
 }

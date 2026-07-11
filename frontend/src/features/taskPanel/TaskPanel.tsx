@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useTaskStore } from '../../stores/taskStore'
 import { useOutputStore } from '../../stores/outputStore'
-import { useTabStore } from '../../stores/tabStore'
 import { taskApi } from '../../services/taskApi'
 import { ScrollArea } from '../../components/ui/ScrollArea'
 import { Button } from '../../components/ui/Button'
@@ -33,7 +32,6 @@ interface TaskItemProps {
 
 function TaskItem({ task, onTaskClick }: TaskItemProps) {
   const { t } = useT()
-  const { activateTab, addTab } = useTabStore()
 
   const handleOpenOutput = () => {
     onTaskClick(task.id)

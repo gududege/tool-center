@@ -4,13 +4,19 @@ import (
 	"github.com/cli-tool-center/tool-center/internal/domain/settings"
 )
 
+// SettingsRepository 配置仓储接口
+type SettingsRepository interface {
+	Get() (*settings.Settings, error)
+	Save(s *settings.Settings) error
+}
+
 // Service 配置应用服务
 type Service struct {
-	repo *Repository
+	repo SettingsRepository
 }
 
 // NewService 创建配置服务
-func NewService(repo *Repository) *Service {
+func NewService(repo SettingsRepository) *Service {
 	return &Service{
 		repo: repo,
 	}

@@ -42,6 +42,44 @@ func TestInMemoryBus_Unsubscribe(t *testing.T) {
 	}
 }
 
+func TestInMemoryBus_UnsubscribeMultipleOnSameTopic(t *testing.T) {
+	bus := NewInMemoryBus()
+	var mu sync.Mutex
+	received := make([]string, 0)
+
+	c1 := bus.Subscribe("test.event", func(event domainEvents.DomainEvent) {
+		mu.Lock()
+		received = append(received, "h1")
+		mu.Unlock()
+	})
+	c2 := bus.Subscribe("test.event", func(event domainEvents.DomainEvent) {
+		mu.Lock()
+		received = append(received, "h2")
+		mu.Unlock()
+	})
+
+	c1()
+
+	bus.Publish(testEvent{id: "x"})
+
+	mu.Lock()
+	if len(received) != 1 || received[0] != "h2" {
+		t.Errorf("after c1 cancelled, expected only h2, got %v", received)
+	}
+	mu.Unlock()
+
+	c2()
+	received = nil
+	bus.Publish(testEvent{id: "y"})
+
+	mu.Lock()
+	if len(received) != 0 {
+		t.Errorf("after both cancelled, expected empty, got %v", received)
+	}
+	mu.Unlock()
+	_ = c2
+}
+
 func TestInMemoryBus_MultipleSubscribers(t *testing.T) {
 	bus := NewInMemoryBus()
 	var mu sync.Mutex

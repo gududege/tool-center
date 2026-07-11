@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { useTranslation } from '../hooks/useTranslation'
 
 interface TranslationContextValue {
@@ -15,9 +15,10 @@ const TranslationContext = createContext<TranslationContextValue>({
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
   const { t, lang, setLanguage } = useTranslation()
+  const value = useMemo(() => ({ t, lang, setLanguage }), [t, lang, setLanguage])
 
   return (
-    <TranslationContext.Provider value={{ t, lang, setLanguage }}>
+    <TranslationContext.Provider value={value}>
       {children}
     </TranslationContext.Provider>
   )

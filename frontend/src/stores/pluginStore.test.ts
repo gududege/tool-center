@@ -31,7 +31,7 @@ describe('pluginStore', () => {
     // Reset store state between tests
     usePluginStore.setState({
       plugins: [],
-      pluginCache: new Map(),
+      pluginCache: {},
       loading: false,
       error: null,
     })

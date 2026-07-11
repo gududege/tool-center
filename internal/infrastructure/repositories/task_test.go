@@ -12,7 +12,7 @@ func TestMemoryTaskRepository_SaveAndGet(t *testing.T) {
 	tsk := &task.Task{
 		ID:       "task-1",
 		PluginID: "test-plugin",
-		Status:   task.TaskCreated,
+		Status:   task.Created,
 	}
 
 	if err := repo.Save(tsk); err != nil {
@@ -43,7 +43,7 @@ func TestMemoryTaskRepository_List(t *testing.T) {
 		repo.Save(&task.Task{
 			ID:       string(rune('A' + i)),
 			PluginID: "p1",
-			Status:   task.TaskCreated,
+			Status:   task.Created,
 		})
 	}
 
@@ -73,13 +73,13 @@ func TestMemoryTaskRepository_Delete(t *testing.T) {
 func TestMemoryTaskRepository_Update(t *testing.T) {
 	repo := NewMemoryTaskRepository()
 
-	repo.Save(&task.Task{ID: "t1", PluginID: "p1", Status: task.TaskCreated})
+	repo.Save(&task.Task{ID: "t1", PluginID: "p1", Status: task.Created})
 
 	// 更新
-	repo.Save(&task.Task{ID: "t1", PluginID: "p1", Status: task.TaskRunning})
+	repo.Save(&task.Task{ID: "t1", PluginID: "p1", Status: task.Running})
 
 	got, _ := repo.Get("t1")
-	if got.Status != task.TaskRunning {
+	if got.Status != task.Running {
 		t.Errorf("expected status 'running', got '%s'", got.Status)
 	}
 }

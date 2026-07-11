@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/cli-tool-center/tool-center/internal/domain/settings"
+	infraSettings "github.com/cli-tool-center/tool-center/internal/infrastructure/persistence/settings"
 )
 
 func TestService_GetSettings(t *testing.T) {
-	repo := NewRepository(filepath.Join(t.TempDir(), "settings.json"))
+	repo := infraSettings.NewRepository(filepath.Join(t.TempDir(), "settings.json"))
 	svc := NewService(repo)
 
 	s, err := svc.GetSettings()
@@ -25,7 +26,7 @@ func TestService_GetSettings(t *testing.T) {
 }
 
 func TestService_SaveSettings(t *testing.T) {
-	repo := NewRepository(filepath.Join(t.TempDir(), "settings.json"))
+	repo := infraSettings.NewRepository(filepath.Join(t.TempDir(), "settings.json"))
 	svc := NewService(repo)
 
 	s := &settings.Settings{
@@ -50,7 +51,7 @@ func TestService_SaveSettings(t *testing.T) {
 
 func TestService_RoundTrip(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
-	repo := NewRepository(tmpFile)
+	repo := infraSettings.NewRepository(tmpFile)
 	svc := NewService(repo)
 
 	s1, _ := svc.GetSettings()
@@ -70,8 +71,7 @@ func TestService_RoundTrip(t *testing.T) {
 func TestService_FilePersistence(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
 
-	// 第一次：保存
-	repo1 := NewRepository(tmpFile)
+	repo1 := infraSettings.NewRepository(tmpFile)
 	svc1 := NewService(repo1)
 	svc1.SaveSettings(&settings.Settings{
 		Theme:           "light",
@@ -82,8 +82,7 @@ func TestService_FilePersistence(t *testing.T) {
 		t.Fatal("settings file should not be empty after save")
 	}
 
-	// 第二次：新建实例加载
-	repo2 := NewRepository(tmpFile)
+	repo2 := infraSettings.NewRepository(tmpFile)
 	repo2.Load()
 	svc2 := NewService(repo2)
 	loaded, _ := svc2.GetSettings()

@@ -50,14 +50,16 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   refreshTask: async (taskId: string) => {
     try {
       const task = await taskApi.getTask(taskId)
-      // Task may be deleted (404)
       if (!task) {
         get().removeTask(taskId)
         return
       }
       get().updateTask(taskId, task)
-    } catch {
-      get().removeTask(taskId)
+    } catch (err: any) {
+      // only remove on 404; transient errors keep the task
+      if (err?.message?.includes('not found')) {
+        get().removeTask(taskId)
+      }
     }
   },
 }))

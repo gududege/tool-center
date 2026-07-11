@@ -1,8 +1,10 @@
 package task
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/cli-tool-center/tool-center/internal/domain/events"
@@ -10,6 +12,7 @@ import (
 	"github.com/cli-tool-center/tool-center/internal/domain/plugin"
 	domainProcess "github.com/cli-tool-center/tool-center/internal/domain/process"
 	domainTask "github.com/cli-tool-center/tool-center/internal/domain/task"
+	"github.com/google/uuid"
 )
 
 // ProcessRunner 进程运行器接口
@@ -38,8 +41,10 @@ type Service struct {
 	runner       ProcessRunner
 	paramBuilder ParameterBuilder
 	eventBus     events.Bus
+	outputsMu    sync.RWMutex
 	outputs      map[string]*output.OutputBuffer
 	maxOutput    int
+	cancels      sync.Map
 }
 
 // NewService 创建任务服务
@@ -86,7 +91,7 @@ func (s *Service) RunPlugin(pluginID string, formData map[string]any) (string, e
 	task := &domainTask.Task{
 		ID:        generateID(),
 		PluginID:  pluginID,
-		Status:    domainTask.TaskCreated,
+		Status:    domainTask.Created,
 		CreatedAt: time.Now(),
 	}
 	if err := s.tasks.Save(task); err != nil {
@@ -94,11 +99,13 @@ func (s *Service) RunPlugin(pluginID string, formData map[string]any) (string, e
 	}
 
 	// 初始化输出缓冲区
+	s.outputsMu.Lock()
 	s.outputs[task.ID] = &output.OutputBuffer{
 		TaskID: task.ID,
 		Events: make([]output.OutputEvent, 0),
 		MaxLen: s.maxOutput,
 	}
+	s.outputsMu.Unlock()
 
 	// 发送创建事件
 	s.eventBus.Publish(events.TaskCreated{
@@ -107,84 +114,117 @@ func (s *Service) RunPlugin(pluginID string, formData map[string]any) (string, e
 	})
 
 	// 异步执行
-	go s.executeTask(task, p, args)
+	go s.executeTask(task.ID, p, args)
 
 	return task.ID, nil
 }
 
-func (s *Service) executeTask(task *domainTask.Task, p *plugin.Plugin, args []string) {
-	// 更新状态为 queued
-	task.Status = domainTask.TaskQueued
-	_ = s.tasks.Save(task)
+func (s *Service) executeTask(taskID string, p *plugin.Plugin, args []string) {
+	ctx, cancel := context.WithCancel(context.Background())
+	s.cancels.Store(taskID, cancel)
+	defer s.cancels.Delete(taskID)
+	defer cancel()
 
-	// 更新为 running
-	now := time.Now()
-	task.Status = domainTask.TaskRunning
-	task.StartedAt = &now
-	_ = s.tasks.Save(task)
-	s.eventBus.Publish(events.TaskStarted{TaskID: task.ID})
+	s.transitionTaskStatus(taskID, domainTask.Queued)
+	s.transitionTaskStatus(taskID, domainTask.Running)
 
-	s.appendSystemOutput(task.ID, "Task started")
+	_ = ctx // placeholder for future context propagation to runner
 
-	// 准备环境变量
+	s.eventBus.Publish(events.TaskStarted{TaskID: taskID})
+	s.appendSystemOutput(taskID, "Task started")
+
 	env := make([]string, 0)
 	for k, v := range p.Execution.Environment {
 		env = append(env, k+"="+v)
 	}
 
-	// 启动进程
-	err := s.runner.Start(task.ID, domainProcess.StartRequest{
+	err := s.runner.Start(taskID, domainProcess.StartRequest{
 		Executable:       p.Execution.Executable,
 		Arguments:        args,
 		WorkingDirectory: p.Execution.WorkingDirectory,
 		Environment:      env,
 	})
 	if err != nil {
-		task.Status = domainTask.TaskFailed
-		task.ErrorMessage = err.Error()
-		now := time.Now()
-		task.EndedAt = &now
-		_ = s.tasks.Save(task)
-		s.appendSystemOutput(task.ID, fmt.Sprintf("Task failed: %v", err))
-		s.eventBus.Publish(events.TaskFailed{TaskID: task.ID, Error: err.Error()})
+		s.saveTaskFinalState(taskID, domainTask.Failed, err.Error(), nil)
+		s.appendSystemOutput(taskID, fmt.Sprintf("Task failed: %v", err))
+		s.eventBus.Publish(events.TaskFailed{TaskID: taskID, Error: err.Error()})
 		return
 	}
 
-	// 等待结束
-	exitCode, waitErr := s.runner.Wait(task.ID)
+	exitCode, waitErr := s.runner.Wait(taskID)
 
 	if waitErr != nil {
-		// 检查是否是取消导致的
-		t, _ := s.tasks.Get(task.ID)
-		if t != nil && t.Status == domainTask.TaskCancelled {
-			s.appendSystemOutput(task.ID, "Task cancelled")
-			s.eventBus.Publish(events.TaskCancelled{TaskID: task.ID})
-			_ = s.runner.Stop(task.ID)
-			s.runner.Remove(task.ID)
+		t, err := s.tasks.Get(taskID)
+		if err != nil {
+			slog.Warn("executeTask: get task failed", "id", taskID, "error", err)
+			s.runner.Remove(taskID)
+			return
+		}
+		if t.Status.IsTerminal() {
+			if t.Status == domainTask.Cancelled {
+				s.appendSystemOutput(taskID, "Task cancelled")
+				s.eventBus.Publish(events.TaskCancelled{TaskID: taskID})
+			}
+			s.runner.Remove(taskID)
 			return
 		}
 
-		task.Status = domainTask.TaskFailed
-		task.ErrorMessage = waitErr.Error()
-		now := time.Now()
-		task.EndedAt = &now
-		_ = s.tasks.Save(task)
-		s.appendSystemOutput(task.ID, fmt.Sprintf("Task failed: %v", waitErr))
-		s.eventBus.Publish(events.TaskFailed{TaskID: task.ID, Error: waitErr.Error()})
-		_ = s.runner.Stop(task.ID)
-		s.runner.Remove(task.ID)
+		s.saveTaskFinalState(taskID, domainTask.Failed, waitErr.Error(), nil)
+		s.appendSystemOutput(taskID, fmt.Sprintf("Task failed: %v", waitErr))
+		s.eventBus.Publish(events.TaskFailed{TaskID: taskID, Error: waitErr.Error()})
+		if err := s.runner.Stop(taskID); err != nil {
+			slog.Warn("executeTask: stop process failed", "id", taskID, "error", err)
+		}
+		s.runner.Remove(taskID)
 		return
 	}
 
-	// 正常完成
-	task.Status = domainTask.TaskCompleted
-	task.ExitCode = &exitCode
-	now = time.Now()
-	task.EndedAt = &now
-	_ = s.tasks.Save(task)
-	s.appendSystemOutput(task.ID, fmt.Sprintf("Task completed with exit code %d", exitCode))
-	s.eventBus.Publish(events.TaskCompleted{TaskID: task.ID, ExitCode: exitCode})
-	s.runner.Remove(task.ID)
+	s.saveTaskFinalState(taskID, domainTask.Completed, "", func(t *domainTask.Task) {
+		t.ExitCode = &exitCode
+	})
+	s.appendSystemOutput(taskID, fmt.Sprintf("Task completed with exit code %d", exitCode))
+	s.eventBus.Publish(events.TaskCompleted{TaskID: taskID, ExitCode: exitCode})
+	s.runner.Remove(taskID)
+}
+
+// transitionTaskStatus 原子更新任务状态
+func (s *Service) transitionTaskStatus(taskID string, status domainTask.TaskStatus) {
+	t, err := s.tasks.Get(taskID)
+	if err != nil {
+		slog.Warn("transition task status: task not found", "id", taskID, "status", status)
+		return
+	}
+	t.Status = status
+	if status == domainTask.Running {
+		now := time.Now()
+		t.StartedAt = &now
+	}
+	if err := s.tasks.Save(t); err != nil {
+		slog.Warn("transition task status: save failed", "id", taskID, "status", status, "error", err)
+	}
+}
+
+// saveTaskFinalState 保存任务终态，若已被 CancelTask 设为终态则跳过。
+// apply 可选，用于在 Save 前设置附加字段（如 ExitCode）。
+func (s *Service) saveTaskFinalState(taskID string, status domainTask.TaskStatus, errMsg string, apply func(t *domainTask.Task)) {
+	t, err := s.tasks.Get(taskID)
+	if err != nil {
+		slog.Warn("save task final state: task not found", "id", taskID)
+		return
+	}
+	if t.Status.IsTerminal() {
+		return
+	}
+	t.Status = status
+	t.ErrorMessage = errMsg
+	now := time.Now()
+	t.EndedAt = &now
+	if apply != nil {
+		apply(t)
+	}
+	if err := s.tasks.Save(t); err != nil {
+		slog.Warn("save task final state: save failed", "id", taskID, "error", err)
+	}
 }
 
 // handleOutput 处理进程输出
@@ -202,12 +242,10 @@ func (s *Service) handleOutput(taskID string, line string, source string) {
 		Message:   line,
 	}
 
-	// 追加到缓冲区
-	if buf, ok := s.outputs[taskID]; ok {
+	if buf := s.getOutputBuffer(taskID); buf != nil {
 		buf.Append(event)
 	}
 
-	// 发布事件
 	s.eventBus.Publish(events.OutputReceived{
 		TaskID: taskID,
 		Event:  event,
@@ -224,7 +262,7 @@ func (s *Service) appendSystemOutput(taskID string, message string) {
 		Message:   message,
 	}
 
-	if buf, ok := s.outputs[taskID]; ok {
+	if buf := s.getOutputBuffer(taskID); buf != nil {
 		buf.Append(event)
 	}
 
@@ -232,6 +270,13 @@ func (s *Service) appendSystemOutput(taskID string, message string) {
 		TaskID: taskID,
 		Event:  event,
 	})
+}
+
+// getOutputBuffer 线程安全获取输出缓冲区
+func (s *Service) getOutputBuffer(taskID string) *output.OutputBuffer {
+	s.outputsMu.RLock()
+	defer s.outputsMu.RUnlock()
+	return s.outputs[taskID]
 }
 
 // GetTask 获取单个任务
@@ -256,11 +301,18 @@ func (s *Service) CancelTask(id string) error {
 	}
 
 	oldStatus := task.Status
-	task.Status = domainTask.TaskCancelled
-	_ = s.tasks.Save(task)
+	task.Status = domainTask.Cancelled
+	if err := s.tasks.Save(task); err != nil {
+		slog.Warn("cancel task: save failed", "id", id, "error", err)
+	}
 
-	// 停止进程
-	_ = s.runner.Stop(id)
+	if cancel, ok := s.cancels.Load(id); ok {
+		cancel.(context.CancelFunc)()
+	}
+
+	if err := s.runner.Stop(id); err != nil {
+		slog.Warn("cancel task: stop process failed", "id", id, "error", err)
+	}
 
 	s.appendSystemOutput(id, "Task cancelled by user")
 
@@ -275,15 +327,19 @@ func (s *Service) CancelTask(id string) error {
 
 // DeleteTask 删除任务
 func (s *Service) DeleteTask(id string) error {
-	_ = s.tasks.Delete(id)
+	if err := s.tasks.Delete(id); err != nil {
+		slog.Warn("delete task: failed", "id", id, "error", err)
+	}
+	s.outputsMu.Lock()
 	delete(s.outputs, id)
+	s.outputsMu.Unlock()
 	return nil
 }
 
 // GetTaskOutput 获取任务输出
 func (s *Service) GetTaskOutput(taskID string) ([]output.OutputEvent, error) {
-	buf, ok := s.outputs[taskID]
-	if !ok {
+	buf := s.getOutputBuffer(taskID)
+	if buf == nil {
 		return nil, fmt.Errorf("output for task %s not found", taskID)
 	}
 	return buf.GetEvents(), nil
@@ -291,5 +347,5 @@ func (s *Service) GetTaskOutput(taskID string) ([]output.OutputEvent, error) {
 
 // generateID 生成简单 ID
 func generateID() string {
-	return fmt.Sprintf("task-%d", time.Now().UnixNano())
+	return "task-" + uuid.New().String()
 }

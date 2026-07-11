@@ -13,6 +13,7 @@ import (
 	"github.com/cli-tool-center/tool-center/internal/domain/settings"
 	"github.com/cli-tool-center/tool-center/internal/infrastructure/events"
 	"github.com/cli-tool-center/tool-center/internal/infrastructure/filesystem"
+	infraSettings "github.com/cli-tool-center/tool-center/internal/infrastructure/persistence/settings"
 	processInfra "github.com/cli-tool-center/tool-center/internal/infrastructure/process"
 	"github.com/cli-tool-center/tool-center/internal/infrastructure/repositories"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -22,7 +23,7 @@ import (
 type App struct {
 	// Settings
 	Settings     *settings.Settings
-	SettingsRepo *appSettings.Repository
+	SettingsRepo *infraSettings.Repository
 	SettingsSvc  *appSettings.Service
 	SettingsApi  *wails.SettingsApi
 
@@ -55,12 +56,15 @@ type App struct {
 
 // Initialize 初始化所有依赖
 func Initialize() (*App, error) {
+	// compile-time interface compliance check
+	var _ appSettings.SettingsRepository = (*infraSettings.Repository)(nil)
+
 	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})))
 	slog.Info("initializing application...")
 
 	// 1. Settings
 	settingsPath := "settings.json"
-	settingsRepo := appSettings.NewRepository(settingsPath)
+	settingsRepo := infraSettings.NewRepository(settingsPath)
 	if err := settingsRepo.Load(); err != nil {
 		slog.Warn("load settings", "error", err)
 	}

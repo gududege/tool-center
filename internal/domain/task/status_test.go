@@ -9,12 +9,12 @@ func TestTaskStatus_IsTerminal(t *testing.T) {
 		status TaskStatus
 		want   bool
 	}{
-		{TaskCreated, false},
-		{TaskQueued, false},
-		{TaskRunning, false},
-		{TaskCompleted, true},
-		{TaskFailed, true},
-		{TaskCancelled, true},
+		{Created, false},
+		{Queued, false},
+		{Running, false},
+		{Completed, true},
+		{Failed, true},
+		{Cancelled, true},
 	}
 
 	for _, tt := range tests {
@@ -32,24 +32,24 @@ func TestTaskStatus_ValidTransitions(t *testing.T) {
 		want bool
 	}{
 		// 合法转换
-		{TaskCreated, TaskQueued, true},
-		{TaskQueued, TaskRunning, true},
-		{TaskRunning, TaskCompleted, true},
-		{TaskRunning, TaskFailed, true},
-		{TaskRunning, TaskCancelled, true},
+		{Created, Queued, true},
+		{Queued, Running, true},
+		{Running, Completed, true},
+		{Running, Failed, true},
+		{Running, Cancelled, true},
 
 		// 非法转换
-		{TaskCreated, TaskRunning, false},
-		{TaskCreated, TaskCompleted, false},
-		{TaskQueued, TaskCompleted, false},
-		{TaskCompleted, TaskRunning, false},
-		{TaskFailed, TaskRunning, false},
-		{TaskCancelled, TaskRunning, false},
-		{TaskCompleted, TaskFailed, false},
+		{Created, Running, false},
+		{Created, Completed, false},
+		{Queued, Completed, false},
+		{Completed, Running, false},
+		{Failed, Running, false},
+		{Cancelled, Running, false},
+		{Completed, Failed, false},
 
 		// 相同状态
-		{TaskCreated, TaskCreated, false},
-		{TaskRunning, TaskRunning, false},
+		{Created, Created, false},
+		{Running, Running, false},
 	}
 
 	for _, tt := range tests {
@@ -68,29 +68,29 @@ func TestTaskStatus_ValidTransitions(t *testing.T) {
 
 func TestTask_CanTransitionTo(t *testing.T) {
 	t.Run("successful transition", func(t *testing.T) {
-		task := &Task{Status: TaskCreated}
-		if !task.CanTransitionTo(TaskQueued) {
+		task := &Task{Status: Created}
+		if !task.CanTransitionTo(Queued) {
 			t.Error("expected Created -> Queued to be valid")
 		}
 	})
 
 	t.Run("invalid transition returns false", func(t *testing.T) {
-		task := &Task{Status: TaskCreated}
-		if task.CanTransitionTo(TaskRunning) {
+		task := &Task{Status: Created}
+		if task.CanTransitionTo(Running) {
 			t.Error("expected Created -> Running to be invalid")
 		}
 	})
 
 	t.Run("completed task cannot transition", func(t *testing.T) {
-		task := &Task{Status: TaskCompleted}
-		if task.CanTransitionTo(TaskRunning) {
+		task := &Task{Status: Completed}
+		if task.CanTransitionTo(Running) {
 			t.Error("expected Completed -> Running to be invalid")
 		}
 	})
 
 	t.Run("cancelled task cannot transition", func(t *testing.T) {
-		task := &Task{Status: TaskCancelled}
-		if task.CanTransitionTo(TaskRunning) {
+		task := &Task{Status: Cancelled}
+		if task.CanTransitionTo(Running) {
 			t.Error("expected Cancelled -> Running to be invalid")
 		}
 	})

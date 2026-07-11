@@ -21,7 +21,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       const settings = await settingsApi.getSettings()
       set({ settings, loading: false })
-      applyTheme(settings.theme)
     } catch {
       set({ loading: false })
     }
@@ -30,7 +29,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   saveSettings: async (settings: SettingsDto) => {
     await settingsApi.saveSettings(settings)
     set({ settings })
-    applyTheme(settings.theme)
   },
 
   updateLayout: (patch) => {
@@ -38,7 +36,6 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (!current) return
     const updated = { ...current, ...patch }
     set({ settings: updated })
-    // 异步保存不阻塞 UI
     settingsApi.saveSettings(updated).catch(() => {})
   },
 
@@ -50,14 +47,3 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await settingsApi.saveSettings(updated)
   },
 }))
-
-function applyTheme(theme: string) {
-  if (theme === 'dark') {
-    document.documentElement.classList.add('dark')
-  } else if (theme === 'light') {
-    document.documentElement.classList.remove('dark')
-  } else {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.classList.toggle('dark', prefersDark)
-  }
-}

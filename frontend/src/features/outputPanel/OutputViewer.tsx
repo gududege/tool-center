@@ -30,7 +30,7 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
 
   const handleCopy = () => {
     const text = lines.map((l) => `[${l.timestamp}] [${l.source}] ${l.message}`).join('\n')
-    navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(text).catch(() => {})
   }
 
   return (
@@ -65,7 +65,7 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
           ) : (
             filteredLines.map((line, i) => (
               <div
-                key={i}
+                key={`${taskId}-${i}`}
                 className={`whitespace-pre-wrap ${
                   line.source === 'stderr'
                     ? 'text-red-400'

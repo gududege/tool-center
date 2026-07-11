@@ -25,7 +25,8 @@ export function ThemeToggle() {
   }, [open])
 
   const handleSelect = async (theme: string) => {
-    await saveSettings({ ...settings!, theme })
+    if (!settings) return
+    await saveSettings({ ...settings, theme })
     setOpen(false)
   }
 

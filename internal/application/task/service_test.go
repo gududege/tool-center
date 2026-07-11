@@ -203,8 +203,8 @@ func TestService_RunPlugin(t *testing.T) {
 	if task.PluginID != "test-plugin" {
 		t.Errorf("PluginID = %s, want test-plugin", task.PluginID)
 	}
-	if task.Status != domainTask.TaskCompleted {
-		t.Errorf("Status = %s, want %s", task.Status, domainTask.TaskCompleted)
+	if task.Status != domainTask.Completed {
+		t.Errorf("Status = %s, want %s", task.Status, domainTask.Completed)
 	}
 }
 
@@ -283,8 +283,8 @@ func TestService_CancelTask(t *testing.T) {
 	}
 
 	task, _ := svc.GetTask(taskID)
-	if task.Status != domainTask.TaskCancelled {
-		t.Errorf("Status = %s, want %s", task.Status, domainTask.TaskCancelled)
+	if task.Status != domainTask.Cancelled {
+		t.Errorf("Status = %s, want %s", task.Status, domainTask.Cancelled)
 	}
 }
 
@@ -388,8 +388,8 @@ func TestService_RunPlugin_ProcessStartFailure(t *testing.T) {
 	waitForTask(t, svc, taskID)
 
 	task, _ := svc.GetTask(taskID)
-	if task.Status != domainTask.TaskFailed {
-		t.Errorf("expected status '%s', got '%s'", domainTask.TaskFailed, task.Status)
+	if task.Status != domainTask.Failed {
+		t.Errorf("expected status '%s', got '%s'", domainTask.Failed, task.Status)
 	}
 }
 

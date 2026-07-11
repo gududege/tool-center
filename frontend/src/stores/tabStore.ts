@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { Tab } from '../types'
 
 interface TabState {
+  _counter: number
   tabs: Tab[]
   activeTabId: string | null
 
@@ -13,25 +14,25 @@ interface TabState {
   updateTabTitle: (tabId: string, title: string) => void
 }
 
-let tabCounter = 0
-
 export const useTabStore = create<TabState>((set, get) => ({
+  _counter: 0,
   tabs: [],
   activeTabId: null,
 
   addTab: (tab: Tab) => {
-    const id = tab.id || `tab-${++tabCounter}`
+    const state = get()
+    const id = tab.id || `tab-${state._counter + 1}`
     const newTab = { ...tab, id }
-    set((state) => {
-      // 如果同 plugin 已有未命名的 tab，复用它
-      const existing = state.tabs.find(
+    set((s) => {
+      if (!tab.id) s._counter += 1
+      const existing = s.tabs.find(
         (t) => t.pluginId === tab.pluginId && t.title === tab.title && !t.taskId,
       )
       if (existing) {
         return { activeTabId: existing.id }
       }
       return {
-        tabs: [...state.tabs, newTab],
+        tabs: [...s.tabs, newTab],
         activeTabId: id,
       }
     })

@@ -2,45 +2,50 @@ package events
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"github.com/cli-tool-center/tool-center/internal/domain/events"
 )
 
-// InMemoryBus 基于内存的事件总线实现
 type InMemoryBus struct {
-	mu       sync.RWMutex
-	handlers map[string][]events.Handler
+	mu        sync.RWMutex
+	handlers  map[string]map[uint64]events.Handler
+	idCounter uint64
 }
 
-// NewInMemoryBus 创建事件总线
 func NewInMemoryBus() *InMemoryBus {
 	return &InMemoryBus{
-		handlers: make(map[string][]events.Handler),
+		handlers: make(map[string]map[uint64]events.Handler),
 	}
 }
 
-// Subscribe 订阅事件，返回取消订阅函数
 func (b *InMemoryBus) Subscribe(topic string, handler events.Handler) func() {
+	id := atomic.AddUint64(&b.idCounter, 1)
+
 	b.mu.Lock()
-	b.handlers[topic] = append(b.handlers[topic], handler)
-	// 记录索引以便取消
-	idx := len(b.handlers[topic]) - 1
+	if b.handlers[topic] == nil {
+		b.handlers[topic] = make(map[uint64]events.Handler)
+	}
+	b.handlers[topic][id] = handler
 	b.mu.Unlock()
 
 	return func() {
 		b.mu.Lock()
 		defer b.mu.Unlock()
-		handlers := b.handlers[topic]
-		if idx < len(handlers) {
-			b.handlers[topic] = append(handlers[:idx], handlers[idx+1:]...)
-		}
+		delete(b.handlers[topic], id)
 	}
 }
 
-// Publish 同步发布事件
 func (b *InMemoryBus) Publish(event events.DomainEvent) {
 	b.mu.RLock()
-	handlers := b.handlers[event.Topic()]
+	topic := event.Topic()
+	var handlers []events.Handler
+	if m, ok := b.handlers[topic]; ok {
+		handlers = make([]events.Handler, 0, len(m))
+		for _, h := range m {
+			handlers = append(handlers, h)
+		}
+	}
 	b.mu.RUnlock()
 
 	for _, h := range handlers {
@@ -48,7 +53,6 @@ func (b *InMemoryBus) Publish(event events.DomainEvent) {
 	}
 }
 
-// PublishAsync 异步发布事件
 func (b *InMemoryBus) PublishAsync(event events.DomainEvent) {
 	go b.Publish(event)
 }

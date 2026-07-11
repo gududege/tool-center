@@ -4,7 +4,7 @@ import { pluginApi } from '../services/pluginApi'
 
 interface PluginState {
   plugins: PluginSummaryDto[]
-  pluginCache: Map<string, PluginDto>
+  pluginCache: Record<string, PluginDto>
   loading: boolean
   error: string | null
 
@@ -15,7 +15,7 @@ interface PluginState {
 
 export const usePluginStore = create<PluginState>((set, get) => ({
   plugins: [],
-  pluginCache: new Map(),
+  pluginCache: {},
   loading: false,
   error: null,
 
@@ -30,22 +30,19 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   },
 
   fetchPlugin: async (id: string) => {
-    const cached = get().pluginCache.get(id)
+    const cached = get().pluginCache[id]
     if (cached) return cached
 
     const plugin = await pluginApi.getPlugin(id)
-    set((state) => {
-      const next = new Map(state.pluginCache)
-      next.set(id, plugin)
-      return { pluginCache: next }
-    })
+    set((state) => ({
+      pluginCache: { ...state.pluginCache, [id]: plugin },
+    }))
     return plugin
   },
 
   reloadPlugins: async () => {
     try {
-      // 清除缓存，确保重新加载后获取最新数据
-      set({ pluginCache: new Map() })
+      set({ pluginCache: {} })
       const resp = await pluginApi.reloadPlugins()
       await get().fetchPlugins()
       return resp.count

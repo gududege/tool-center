@@ -1,7 +1,6 @@
 package task
 
 import (
-	"context"
 	"time"
 )
 
@@ -17,7 +16,6 @@ type Task struct {
 	ExitCode     *int
 	ErrorMessage string
 	ProcessID    *string
-	Cancel       context.CancelFunc
 }
 
 // CanTransitionTo 判断是否可以转换到目标状态

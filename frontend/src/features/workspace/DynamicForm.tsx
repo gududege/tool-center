@@ -200,8 +200,8 @@ interface ShadowFormHostProps {
   isDark: boolean
   schema: any
   uiSchema: any
-  formData: Record<string, any>
-  onChange: (formData: Record<string, any>) => void
+  formData: Record<string, unknown>
+  onChange: (formData: Record<string, unknown>) => void
   formRef: React.RefObject<any>
 }
 
@@ -303,13 +303,13 @@ function ShadowFormHost(props: ShadowFormHostProps) {
   // 3. Re-render the form tree when its props change.
   useEffect(() => {
     rootRef.current?.render(<ShadowFormContent {...props} />)
-  })
+  }, [])
 
   return <div ref={hostRef} className="h-full w-full" />
 }
 
 // 根据插件参数映射与当前表单数据生成命令行参数字符串。
-function buildCommand(plugin: PluginDto | null, formData: Record<string, any>): string {
+function buildCommand(plugin: PluginDto | null, formData: Record<string, unknown>): string {
   if (!plugin) return ''
   const exe = plugin.execution?.exe ?? ''
   const params = plugin.execution?.parameters ?? []
@@ -382,7 +382,7 @@ export function DynamicForm({ tab }: DynamicFormProps) {
   const [plugin, setPlugin] = useState<PluginDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const [formData, setFormData] = useState<Record<string, unknown>>({})
   const [running, setRunning] = useState(false)
   const [previewEnabled, setPreviewEnabled] = useState(false)
   const [history, setHistory] = useState<PluginHistoryEntryDto[]>([])
@@ -469,7 +469,7 @@ export function DynamicForm({ tab }: DynamicFormProps) {
     if (!plugin) return
     if (defaultsAppliedFor.current === plugin.metadata.id) return
     const defaults = getDefaultFormState(validator, localizedSchema, {}, localizedSchema)
-    setFormData((prev) => ({ ...(defaults as Record<string, any> || {}), ...prev }))
+    setFormData((prev) => ({ ...(defaults as Record<string, unknown> || {}), ...prev }))
     defaultsAppliedFor.current = plugin.metadata.id
   }, [plugin, localizedSchema])
 
@@ -482,13 +482,16 @@ export function DynamicForm({ tab }: DynamicFormProps) {
 
   // ── Load historical output ──
   useEffect(() => {
+    let cancelled = false
     if (tab.taskId) {
       taskApi.getTaskOutput(tab.taskId).then((lines: OutputEventDto[]) => {
+        if (cancelled) return
         for (const line of lines) {
           appendOutput(tab.taskId!, line)
         }
       })
     }
+    return () => { cancelled = true }
   }, [tab.taskId])
 
   // ── Load plugin history ──
@@ -713,7 +716,7 @@ function localizeSchema(schema: any, lang: string): any {
   if (schema.title_cn && lang === 'zh') out.title = schema.title_cn
   if (schema.description_cn && lang === 'zh') out.description = schema.description_cn
 
-  const props: Record<string, any> = {}
+  const props: Record<string, unknown> = {}
   for (const [key, val] of Object.entries(schema.properties)) {
     const prop = { ...(val as any) }
     if (lang === 'zh' && prop.title_cn) prop.title = prop.title_cn
@@ -756,14 +759,14 @@ function localizeSchema(schema: any, lang: string): any {
 
 function localizeUiSchema(uiSchema: any, lang: string): any {
   if (!uiSchema) return undefined
-  const fieldUi: Record<string, any> = {}
+  const fieldUi: Record<string, unknown> = {}
   const order: string[] = []
   const groups: GroupInfo[] = []
   walkJsonFormsLayout(uiSchema, fieldUi, order, groups, lang)
   if (Object.keys(fieldUi).length === 0 && groups.length === 0) return undefined
   // ui:order 末尾的 '*' 表示「其余字段按 schema 顺序追加」，避免漏掉未在布局里
   // 显式出现的字段。
-  const out: Record<string, any> = { ...fieldUi, 'ui:order': [...order, '*'] }
+  const out: Record<string, unknown> = { ...fieldUi, 'ui:order': [...order, '*'] }
   if (groups.length > 0) {
     out['ui:groups'] = groups
   }
@@ -772,7 +775,7 @@ function localizeUiSchema(uiSchema: any, lang: string): any {
 
 function walkJsonFormsLayout(
   el: any,
-  fieldUi: Record<string, any>,
+  fieldUi: Record<string, unknown>,
   order: string[],
   groups: GroupInfo[],
   lang: string,
@@ -813,7 +816,7 @@ function walkJsonFormsLayout(
 
 function collectControlField(
   el: any,
-  fieldUi: Record<string, any>,
+  fieldUi: Record<string, unknown>,
   order: string[],
   lang: string,
 ): string | null {

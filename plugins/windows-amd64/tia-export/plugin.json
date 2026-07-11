@@ -43,6 +43,11 @@
         "flag": "--keep-folder-structure"
       },
       {
+        "field": "incrementalUpdate",
+        "kind": "switch",
+        "flag": "--incremental-update"
+      },
+      {
         "field": "maxWorkers",
         "kind": "option",
         "flag": "--max-workers"

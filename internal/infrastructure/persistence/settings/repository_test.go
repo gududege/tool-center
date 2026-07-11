@@ -5,11 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/cli-tool-center/tool-center/internal/domain/settings"
+	domainSettings "github.com/cli-tool-center/tool-center/internal/domain/settings"
 )
 
 func TestRepository_DefaultSettings(t *testing.T) {
-	// 文件不存在时使用默认值
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
 	repo := NewRepository(tmpFile)
 
@@ -34,7 +33,7 @@ func TestRepository_SaveAndLoad(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
 	repo := NewRepository(tmpFile)
 
-	s := &settings.Settings{
+	s := &domainSettings.Settings{
 		Theme:           "light",
 		PluginDirectory: "./my-plugins",
 		MaxOutputLines:  5000,
@@ -45,7 +44,6 @@ func TestRepository_SaveAndLoad(t *testing.T) {
 		t.Fatalf("Save failed: %v", err)
 	}
 
-	// 新的 repository 实例应该能正确加载
 	repo2 := NewRepository(tmpFile)
 	if err := repo2.Load(); err != nil {
 		t.Fatalf("Load failed: %v", err)
@@ -71,16 +69,15 @@ func TestRepository_Persistence(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
 	repo := NewRepository(tmpFile)
 
-	s := &settings.Settings{
-		Theme:           "dark",
-		PluginDirectory: "./plugins",
-		MaxOutputLines:  10000,
-		MaxTaskHistory:  100,
+	s := &domainSettings.Settings{
+		Theme:            "dark",
+		PluginDirectory:  "./plugins",
+		MaxOutputLines:   10000,
+		MaxTaskHistory:   100,
 		AutoReloadPlugins: true,
 	}
 	repo.Save(s)
 
-	// 文件应该实际被写入
 	data, err := os.ReadFile(tmpFile)
 	if err != nil {
 		t.Fatalf("ReadFile failed: %v", err)
@@ -95,7 +92,6 @@ func TestRepository_ConcurrentAccess(t *testing.T) {
 	tmpFile := filepath.Join(t.TempDir(), "settings.json")
 	repo := NewRepository(tmpFile)
 
-	// 并发读写
 	done := make(chan bool, 10)
 	for i := 0; i < 10; i++ {
 		go func() {

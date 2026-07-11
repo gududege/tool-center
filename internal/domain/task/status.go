@@ -4,28 +4,28 @@ package task
 type TaskStatus string
 
 const (
-	TaskCreated    TaskStatus = "created"
-	TaskQueued     TaskStatus = "queued"
-	TaskRunning    TaskStatus = "running"
-	TaskCompleted  TaskStatus = "completed"
-	TaskFailed     TaskStatus = "failed"
-	TaskCancelled  TaskStatus = "cancelled"
+	Created    TaskStatus = "created"
+	Queued     TaskStatus = "queued"
+	Running    TaskStatus = "running"
+	Completed  TaskStatus = "completed"
+	Failed     TaskStatus = "failed"
+	Cancelled  TaskStatus = "cancelled"
 )
 
 // IsTerminal 判断是否为终态
 func (s TaskStatus) IsTerminal() bool {
-	return s == TaskCompleted || s == TaskFailed || s == TaskCancelled
+	return s == Completed || s == Failed || s == Cancelled
 }
 
 // ValidTransitions 返回合法状态转换
 func (s TaskStatus) ValidTransitions() []TaskStatus {
 	switch s {
-	case TaskCreated:
-		return []TaskStatus{TaskQueued}
-	case TaskQueued:
-		return []TaskStatus{TaskRunning}
-	case TaskRunning:
-		return []TaskStatus{TaskCompleted, TaskFailed, TaskCancelled}
+	case Created:
+		return []TaskStatus{Queued}
+	case Queued:
+		return []TaskStatus{Running}
+	case Running:
+		return []TaskStatus{Completed, Failed, Cancelled}
 	default:
 		return nil
 	}

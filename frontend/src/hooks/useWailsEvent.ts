@@ -26,7 +26,7 @@ export function useWailsEvent(
 
     return () => {
       if (runtime?.EventsOff) {
-        runtime.EventsOff(eventName)
+        runtime.EventsOff(eventName, stableHandler)
       }
     }
   }, [eventName, stableHandler])

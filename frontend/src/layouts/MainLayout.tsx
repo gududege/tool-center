@@ -20,7 +20,7 @@ interface MainLayoutProps {
   onBottomResize?: (size: { asPercentage: number; inPixels: number }) => void
 }
 
-export function MainLayout({
+function MainLayoutBase({
   sidebar,
   workspace,
   sidebarCollapsed,
@@ -58,8 +58,8 @@ export function MainLayout({
               'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800',
               'transition-colors',
             )}
-            title={sidebarCollapsed ? t('sidebar.title') : t('sidebar.title')}
-            aria-label={sidebarCollapsed ? t('sidebar.title') : t('sidebar.title')}
+            title={t('sidebar.title')}
+            aria-label={t('sidebar.title')}
           >
             <svg
               className="h-4 w-4 transition-transform"
@@ -191,3 +191,5 @@ export function MainLayout({
     </div>
   )
 }
+
+export const MainLayout = React.memo(MainLayoutBase)

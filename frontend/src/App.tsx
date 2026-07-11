@@ -5,10 +5,12 @@ import { Workspace } from './features/workspace'
 import { TaskPanel } from './features/taskPanel'
 import { OutputViewer } from './features/outputPanel'
 import { useTaskEvents } from './hooks/useTaskEvents'
+import { useTheme } from './hooks/useTheme'
 import { useSettingsStore } from './stores/settingsStore'
 import { useT } from './contexts/TranslationContext'
 
 export default function App() {
+  useTheme()
   const settings = useSettingsStore((s) => s.settings)
   const fetchSettings = useSettingsStore((s) => s.fetchSettings)
   const updateLayout = useSettingsStore((s) => s.updateLayout)
