@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"slices"
 	"sync"
 
 	"github.com/cli-tool-center/tool-center/internal/domain/task"
@@ -41,6 +42,9 @@ func (r *MemoryTaskRepository) List() ([]*task.Task, error) {
 	for _, t := range r.tasks {
 		result = append(result, t)
 	}
+	slices.SortFunc(result, func(a, b *task.Task) int {
+		return b.CreatedAt.Compare(a.CreatedAt)
+	})
 	return result, nil
 }
 

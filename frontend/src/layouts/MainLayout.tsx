@@ -3,6 +3,7 @@ import { Group, Panel, Separator } from 'react-resizable-panels'
 import type { PanelImperativeHandle } from 'react-resizable-panels'
 import { ThemeToggle } from '../components/ui/ThemeToggle'
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher'
+import { SettingsPage } from '../features/settings/SettingsPage'
 import { useT } from '../contexts/TranslationContext'
 import { cn } from '../components/ui/cn'
 
@@ -35,6 +36,7 @@ function MainLayoutBase({
 }: MainLayoutProps) {
   const { t } = useT()
   const sidebarRef = React.useRef<PanelImperativeHandle>(null)
+  const [settingsOpen, setSettingsOpen] = React.useState(false)
 
   React.useEffect(() => {
     const api = sidebarRef.current
@@ -79,10 +81,28 @@ function MainLayoutBase({
           <h1 className="text-sm font-semibold">{t('app.title')}</h1>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className={cn(
+              'flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs',
+              'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800',
+              'transition-colors',
+            )}
+            title={t('settings.open')}
+            aria-label={t('settings.open')}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span className="hidden sm:inline text-xs">{t('settings.open')}</span>
+          </button>
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
       </header>
+
+      <SettingsPage open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
       {/* ---- Main ---- */}
       <Group className="flex-1 overflow-hidden">
@@ -154,6 +174,7 @@ function MainLayoutBase({
                         : 'text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800',
                     )}
                     onClick={() => onBottomTabChange('tasks')}
+                    title={t('button.tasks_tab')}
                   >
                     <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -171,6 +192,7 @@ function MainLayoutBase({
                         : 'text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800',
                     )}
                     onClick={() => onBottomTabChange('output')}
+                    title={t('button.output_tab')}
                   >
                     <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="16 18 22 12 16 6" />

@@ -5,7 +5,9 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 	"sync"
+	"time"
 
 	domainProcess "github.com/cli-tool-center/tool-center/internal/domain/process"
 )
@@ -14,6 +16,8 @@ type Runner struct {
 	mu            sync.Mutex
 	processes     map[string]*runningProcess
 	outputHandler func(taskID string, line string, source string)
+	runnerPaths   map[string]string
+	runnerOptions map[string]string
 }
 
 type runningProcess struct {
@@ -22,9 +26,11 @@ type runningProcess struct {
 	wg     sync.WaitGroup
 }
 
-func NewRunner() *Runner {
+func NewRunner(runnerPaths, runnerOptions map[string]string) *Runner {
 	return &Runner{
-		processes: make(map[string]*runningProcess),
+		processes:     make(map[string]*runningProcess),
+		runnerPaths:   runnerPaths,
+		runnerOptions: runnerOptions,
 	}
 }
 
@@ -41,9 +47,23 @@ func (r *Runner) getOutputHandler() func(taskID string, line string, source stri
 }
 
 func (r *Runner) Start(processID string, req domainProcess.StartRequest) error {
-	ctx, cancel := context.WithCancel(context.Background())
+	_, cancel := context.WithCancel(context.Background())
 
-	cmd := exec.CommandContext(ctx, req.Executable, req.Arguments...)
+	var cmd *exec.Cmd
+	if req.Runner == "binary" || req.Runner == "" {
+		cmd = exec.Command(req.Target, req.Arguments...)
+	} else {
+		opts := req.RunnerOptions
+		if len(opts) == 0 {
+			opts = strings.Fields(r.runnerOptions[req.Runner])
+		}
+		allArgs := make([]string, 0, len(opts)+1+len(req.Arguments))
+		allArgs = append(allArgs, opts...)
+		allArgs = append(allArgs, req.Target)
+		allArgs = append(allArgs, req.Arguments...)
+		cmd = exec.Command(req.RunnerPath, allArgs...)
+	}
+	setHideWindow(cmd)
 
 	if req.WorkingDirectory != "" {
 		cmd.Dir = req.WorkingDirectory
@@ -132,6 +152,13 @@ func (r *Runner) Stop(processID string) error {
 		return fmt.Errorf("process %s not found", processID)
 	}
 
+	sendInterrupt(rp.cmd.Process)
+
+	go func() {
+		<-time.After(5 * time.Minute)
+		rp.cmd.Process.Kill()
+	}()
+
 	rp.cancel()
 	return nil
 }
@@ -151,4 +178,11 @@ func (r *Runner) Remove(processID string) {
 		delete(r.processes, processID)
 	}
 	r.mu.Unlock()
+}
+
+func (r *Runner) UpdateRunnerConfig(paths, options map[string]string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.runnerPaths = paths
+	r.runnerOptions = options
 }

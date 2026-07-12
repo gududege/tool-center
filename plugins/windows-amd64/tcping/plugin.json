@@ -20,7 +20,8 @@
     "uischema": "uischema.json"
   },
   "execution": {
-    "exe": "tcping.exe",
+    "target": "tcping.exe",
+    "runner": "binary",
     "parameters": [
       {
         "field": "host",

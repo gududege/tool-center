@@ -37,8 +37,6 @@ export function useTranslation() {
 
   const setLanguage = useCallback((l: string) => {
     setLangState(l)
-    // Dispatch custom event so other components can react
-    window.dispatchEvent(new CustomEvent('languagechange', { detail: l }))
   }, [])
 
   const t = useCallback(

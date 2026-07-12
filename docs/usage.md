@@ -2,7 +2,7 @@
 
 **Project:** CLI Tool Center  
 **Version:** 1.0  
-**Last Updated:** 2026-06-23
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -50,7 +50,8 @@ plugins/my-tool/
     "uischema": "uischema.json"
   },
   "execution": {
-    "exe": "my-tool.exe",
+    "target": "my-tool.exe",
+    "runner": "binary",
     "workingDirectory": ".",
     "environment": { "LOG_LEVEL": "info" },
     "parameters": [
@@ -64,21 +65,22 @@ plugins/my-tool/
 
 ### 2.1 字段速查
 
-| 字段 | 必填 | 说明 |
-| --- | --- | --- |
-| `id` | 是 | 唯一标识，仅含 `a-zA-Z0-9._-` |
-| `name` | 是 | 英文名称 |
-| `name_cn` | 否 | 中文名称 |
-| `description` / `description_cn` | 否 | 描述 |
-| `navigation.group` | 是 | 菜单路径数组，支持多级 |
-| `navigation.group_cn` | 否 | 中文菜单路径 |
-| `navigation.order` | 否 | 排序，越小越靠前 |
-| `form.schema` | 是 | schema.json 路径 |
-| `form.uischema` | 否 | uischema.json 路径 |
-| `execution.exe` | 是 | 可执行文件路径 |
-| `execution.workingDirectory` | 否 | 工作目录 |
-| `execution.environment` | 否 | 环境变量键值对 |
-| `execution.parameters` | 否 | 表单字段到 CLI 参数映射 |
+| 字段                             | 必填 | 说明                                                                                             |
+| -------------------------------- | ---- | ------------------------------------------------------------------------------------------------ |
+| `id`                             | 是   | 唯一标识，仅含 `a-zA-Z0-9._-`                                                                    |
+| `name`                           | 是   | 英文名称                                                                                         |
+| `name_cn`                        | 否   | 中文名称                                                                                         |
+| `description` / `description_cn` | 否   | 描述                                                                                             |
+| `navigation.group`               | 是   | 菜单路径数组，支持多级                                                                           |
+| `navigation.group_cn`            | 否   | 中文菜单路径                                                                                     |
+| `navigation.order`               | 否   | 排序，越小越靠前                                                                                 |
+| `form.schema`                    | 是   | schema.json 路径                                                                                 |
+| `form.uischema`                  | 否   | uischema.json 路径                                                                               |
+| `execution.target`               | 是   | 目标文件路径（可执行文件或脚本等）                                                               |
+| `execution.runner`               | 否   | 运行器类型。可选 `binary`（默认,直接执行）、`cmd`、`bat`、`powershell`、`sh`、`python`、`nodejs` |
+| `execution.workingDirectory`     | 否   | 工作目录                                                                                         |
+| `execution.environment`          | 否   | 环境变量键值对                                                                                   |
+| `execution.parameters`           | 否   | 表单字段到 CLI 参数映射                                                                          |
 
 ---
 
@@ -118,14 +120,14 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 
 ### 3.2 字段类型与默认控件
 
-| Schema Type | 默认控件 |
-| --- | --- |
-| `string` | 文本输入 |
-| `string` + `enum` | 下拉选择 |
-| `integer` / `number` | 数字输入 |
-| `boolean` | 复选框 |
-| `array` + `enum` items | 复选框组 |
-| `object` | 嵌套对象卡片 |
+| Schema Type            | 默认控件     |
+| ---------------------- | ------------ |
+| `string`               | 文本输入     |
+| `string` + `enum`      | 下拉选择     |
+| `integer` / `number`   | 数字输入     |
+| `boolean`              | 复选框       |
+| `array` + `enum` items | 复选框组     |
+| `object`               | 嵌套对象卡片 |
 
 ### 3.3 常用 format
 
@@ -168,13 +170,13 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 
 ### 4.2 布局元素
 
-| 元素 | 说明 |
-| --- | --- |
-| `VerticalLayout` | 垂直排列子元素 |
-| `HorizontalLayout` | 水平排列子元素 |
-| `Group` | 带边框卡片分组 |
-| `Categorization` / `Category` | 分组容器 |
-| `Control` | 单个字段，scope 为 `#/properties/<field>` |
+| 元素                          | 说明                                      |
+| ----------------------------- | ----------------------------------------- |
+| `VerticalLayout`              | 垂直排列子元素                            |
+| `HorizontalLayout`            | 水平排列子元素                            |
+| `Group`                       | 带边框卡片分组                            |
+| `Categorization` / `Category` | 分组容器                                  |
+| `Control`                     | 单个字段，scope 为 `#/properties/<field>` |
 
 ### 4.3 Control Options
 
@@ -186,36 +188,36 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 }
 ```
 
-| Option | 值 | 说明 |
-| --- | --- | --- |
-| `folderPicker` | `true` | 目录选择器 |
-| `filePicker` | `true` | 文件选择器 |
-| `saveFilePicker` | `true` | 保存文件选择器 |
-| `widget` | `"radio"`, `"select"`, `"textarea"`, `"range"`, `"hidden"`, ... | RJSF widget 名称 |
-| `inputType` | `"password"`, `"number"`, ... | HTML input type |
+| Option           | 值                                                              | 说明             |
+| ---------------- | --------------------------------------------------------------- | ---------------- |
+| `folderPicker`   | `true`                                                          | 目录选择器       |
+| `filePicker`     | `true`                                                          | 文件选择器       |
+| `saveFilePicker` | `true`                                                          | 保存文件选择器   |
+| `widget`         | `"radio"`, `"select"`, `"textarea"`, `"range"`, `"hidden"`, ... | RJSF widget 名称 |
+| `inputType`      | `"password"`, `"number"`, ...                                   | HTML input type  |
 
 ### 4.4 支持的 widget 列表
 
 **RJSF / shadcn 内置：**
 
-| Widget | 适用类型 | 说明 |
-| --- | --- | --- |
-| `checkbox` | boolean | 复选框（默认） |
-| `radio` | boolean / enum string | 单选按钮组 |
-| `select` | boolean / enum string / enum array | 下拉选择 |
-| `textarea` | string | 多行文本 |
-| `hidden` | string / number / integer / boolean | 隐藏字段 |
-| `range` | number / integer | 滑块 |
-| `updown` | number / integer | 数字步进器 |
-| `color` | string | 颜色选择 |
-| `password` | string | 密码输入 |
+| Widget     | 适用类型                            | 说明           |
+| ---------- | ----------------------------------- | -------------- |
+| `checkbox` | boolean                             | 复选框（默认） |
+| `radio`    | boolean / enum string               | 单选按钮组     |
+| `select`   | boolean / enum string / enum array  | 下拉选择       |
+| `textarea` | string                              | 多行文本       |
+| `hidden`   | string / number / integer / boolean | 隐藏字段       |
+| `range`    | number / integer                    | 滑块           |
+| `updown`   | number / integer                    | 数字步进器     |
+| `color`    | string                              | 颜色选择       |
+| `password` | string                              | 密码输入       |
 
 **本地自定义：**
 
-| Widget | 说明 |
-| --- | --- |
-| `folderPicker` | 目录选择对话框 |
-| `filePicker` | 文件选择对话框 |
+| Widget           | 说明           |
+| ---------------- | -------------- |
+| `folderPicker`   | 目录选择对话框 |
+| `filePicker`     | 文件选择对话框 |
 | `saveFilePicker` | 保存文件对话框 |
 
 ### 4.5 完整 widget 示例
@@ -230,8 +232,16 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
       "label_cn": "输入",
       "elements": [
         { "type": "Control", "scope": "#/properties/text" },
-        { "type": "Control", "scope": "#/properties/notes", "options": { "widget": "textarea" } },
-        { "type": "Control", "scope": "#/properties/secret", "options": { "inputType": "password" } }
+        {
+          "type": "Control",
+          "scope": "#/properties/notes",
+          "options": { "widget": "textarea" }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/secret",
+          "options": { "inputType": "password" }
+        }
       ]
     },
     {
@@ -239,9 +249,21 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
       "label": "Pickers",
       "label_cn": "选择器",
       "elements": [
-        { "type": "Control", "scope": "#/properties/indir", "options": { "folderPicker": true } },
-        { "type": "Control", "scope": "#/properties/infile", "options": { "filePicker": true } },
-        { "type": "Control", "scope": "#/properties/outfile", "options": { "saveFilePicker": true } }
+        {
+          "type": "Control",
+          "scope": "#/properties/indir",
+          "options": { "folderPicker": true }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/infile",
+          "options": { "filePicker": true }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/outfile",
+          "options": { "saveFilePicker": true }
+        }
       ]
     },
     {
@@ -249,13 +271,111 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
       "label": "Choices",
       "label_cn": "选项",
       "elements": [
-        { "type": "Control", "scope": "#/properties/mode", "options": { "widget": "radio" } },
-        { "type": "Control", "scope": "#/properties/tags", "options": { "widget": "select" } }
+        {
+          "type": "Control",
+          "scope": "#/properties/mode",
+          "options": { "widget": "radio" }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/tags",
+          "options": { "widget": "select" }
+        }
       ]
     }
   ]
 }
 ```
+---
+
+### 4.6 Group 包裹规则
+
+`BorderedObjectFieldTemplate` 的渲染顺序是 **先 Group，后剩余字段**：
+
+```text
+┌─ Group ───────────────────┐
+│   field-a, field-b, ...   │  ← 按 uischema 中 Group 的顺序
+└───────────────────────────┘
+┌─ Group ───────────────────┐
+│   field-c, ...            │
+└───────────────────────────┘
+┌─ 🔻 未被 Group 包裹的字段 ──┐
+│   field-x                  │  ← 被排到最后
+└────────────────────────────┘
+```
+
+**因此每个字段都必须在至少一个 Group 内**，包括单字段场景（如 discriminator selector），否则会被渲染到所有 Group 之后，破坏预期顺序。
+
+**空 Group 自动隐藏**：当 `oneOf` / `dependencies` / `if-then` 条件导致某 Group 内的所有字段在当前分支中不存时，该 Group 容器不会渲染（不会出现空心边框）。
+
+**推荐分组策略**：
+
+- 按业务语义分组（如 `Target Configuration`、`Metadata`）
+- 条件性字段独立分组（如 `Payload (Bundle Mode)`，仅 `mode=bundle` 时该 Group 有内容）
+- 单字段也用 Group 包裹，标签起说明性作用（如 `Command`）
+
+**配合 `oneOf` / `dependencies` 示例**（精简后的 `schema.json`）：
+
+```json
+{
+  "properties": {
+    "command": { "type": "string", "enum": ["build", "inspect"], "default": "build" }
+  },
+  "dependencies": {
+    "command": {
+      "oneOf": [
+        {
+          "properties": {
+            "command": { "enum": ["build"] },
+            "output": { "type": "string" },
+            "entry":  { "type": "string" }
+          }
+        },
+        {
+          "properties": {
+            "command": { "enum": ["inspect"] },
+            "bundlePath": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+对应的 `uischema.json` 所有字段都在 Group 内：
+
+```json
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "Command",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/command" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Build Configuration",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/output", "options": { "saveFilePicker": true } },
+        { "type": "Control", "scope": "#/properties/entry",  "options": { "filePicker": true } }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Inspect",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/bundlePath", "options": { "filePicker": true } }
+      ]
+    }
+  ]
+}
+```
+
+选择 `build` 时只显示 Command + Build Configuration；选择 `inspect` 时只显示 Command + Inspect。空 Group 不渲染。
 
 ---
 
@@ -265,17 +385,17 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 
 ### 5.1 参数类型
 
-| Kind | 字段值 | 输出 |
-| --- | --- | --- |
-| `argument` | `"value"` | `value` |
-| `argument-array` | `["a", "b"]` | `a b` |
-| `option` | `"value"` | `--flag value` |
-| `switch` | `true` | `--flag` |
-| `switch` | `false` | （无输出） |
-| `bool-option` | `true` | `--flag true` |
-| `bool-option` | `false` | `--flag false` |
-| `dual-switch` | `true` | `--trueFlag` |
-| `dual-switch` | `false` | `--falseFlag` |
+| Kind             | 字段值       | 输出           |
+| ---------------- | ------------ | -------------- |
+| `argument`       | `"value"`    | `value`        |
+| `argument-array` | `["a", "b"]` | `a b`          |
+| `option`         | `"value"`    | `--flag value` |
+| `switch`         | `true`       | `--flag`       |
+| `switch`         | `false`      | （无输出）     |
+| `bool-option`    | `true`       | `--flag true`  |
+| `bool-option`    | `false`      | `--flag false` |
+| `dual-switch`    | `true`       | `--trueFlag`   |
+| `dual-switch`    | `false`      | `--falseFlag`  |
 
 ### 5.2 option-array 风格
 
@@ -290,7 +410,13 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 ```
 
 ```json
-{ "field": "tags", "kind": "option-array", "flag": "--tags", "style": "join", "separator": "," }
+{
+  "field": "tags",
+  "kind": "option-array",
+  "flag": "--tags",
+  "style": "join",
+  "separator": ","
+}
 ```
 
 输出：
@@ -300,7 +426,13 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
 ```
 
 ```json
-{ "field": "tags", "kind": "option-array", "flag": "--tags", "style": "equals", "separator": "," }
+{
+  "field": "tags",
+  "kind": "option-array",
+  "flag": "--tags",
+  "style": "equals",
+  "separator": ","
+}
 ```
 
 输出：
@@ -336,7 +468,8 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
     "uischema": "uischema.json"
   },
   "execution": {
-    "exe": "file-copy.exe",
+    "target": "file-copy.exe",
+    "runner": "binary",
     "parameters": [
       { "field": "source", "kind": "option", "flag": "--source" },
       { "field": "target", "kind": "option", "flag": "--target" },
@@ -385,17 +518,23 @@ CLI Tool Center 使用 **JSON Schema draft 2020-12** 描述表单。
       "label": "Paths",
       "label_cn": "路径",
       "elements": [
-        { "type": "Control", "scope": "#/properties/source", "options": { "filePicker": true } },
-        { "type": "Control", "scope": "#/properties/target", "options": { "folderPicker": true } }
+        {
+          "type": "Control",
+          "scope": "#/properties/source",
+          "options": { "filePicker": true }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/target",
+          "options": { "folderPicker": true }
+        }
       ]
     },
     {
       "type": "Group",
       "label": "Options",
       "label_cn": "选项",
-      "elements": [
-        { "type": "Control", "scope": "#/properties/overwrite" }
-      ]
+      "elements": [{ "type": "Control", "scope": "#/properties/overwrite" }]
     }
   ]
 }

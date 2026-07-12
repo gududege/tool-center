@@ -3,7 +3,8 @@ import { useOutputStore } from '../../stores/outputStore'
 import { DynamicForm } from './DynamicForm'
 import { ScrollArea } from '../../components/ui/ScrollArea'
 import { useT } from '../../contexts/TranslationContext'
-import type { Tab } from '../../types'
+import { ansiToHtml } from '../../lib/ansiToHtml'
+import type { Tab, OutputLine } from '../../types'
 
 export function Workspace() {
   const { t } = useT()
@@ -64,9 +65,7 @@ export function Workspace() {
             key={tab.id}
             className={`h-full ${activeTabId === tab.id ? 'block' : 'hidden'}`}
           >
-            {tab.taskId && !tab.pluginId.startsWith('output-') ? (
-              <DynamicForm tab={tab} />
-            ) : tab.taskId ? (
+            {tab.taskId && tab.pluginId.startsWith('output-') ? (
               <OutputTab tab={tab} />
             ) : (
               <DynamicForm tab={tab} />
@@ -93,12 +92,13 @@ function OutputTab({ tab }: { tab: Tab }) {
         {outputLines.length === 0 ? (
           <p className="text-neutral-500">{t('output.no_output')}</p>
         ) : (
-          outputLines.map((line: any, i: number) => (
-            <div key={i} className="whitespace-pre-wrap">
+          outputLines.map((line: OutputLine, i: number) => (
+            <div key={`${line.timestamp}-${i}`} className="whitespace-pre-wrap">
               <span className="text-neutral-500">[{line.timestamp?.slice(11, 19) ?? '--:--:--'}]</span>{' '}
-              <span className={line.level === 'error' || line.level === 'warn' ? 'text-red-400' : ''}>
-                {line.message}
-              </span>
+              <span
+                className={line.level === 'error' || line.level === 'warn' ? 'text-red-400' : ''}
+                dangerouslySetInnerHTML={{ __html: ansiToHtml(line.message) }}
+              />
             </div>
           ))
         )}

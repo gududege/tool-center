@@ -63,7 +63,8 @@ export namespace wails {
 	    }
 	}
 	export class ExecutionDefinitionDto {
-	    exe: string;
+	    target: string;
+	    runner?: string;
 	    workingDirectory?: string;
 	    parameters?: ParameterMappingDto[];
 	
@@ -73,7 +74,8 @@ export namespace wails {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.exe = source["exe"];
+	        this.target = source["target"];
+	        this.runner = source["runner"];
 	        this.workingDirectory = source["workingDirectory"];
 	        this.parameters = this.convertValues(source["parameters"], ParameterMappingDto);
 	    }
@@ -331,6 +333,8 @@ export namespace wails {
 	    sidebarSize: number;
 	    bottomPanelSize: number;
 	    bottomTab: string;
+	    runnerPaths?: Record<string, string>;
+	    runnerOptions?: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
 	        return new SettingsDto(source);
@@ -346,6 +350,8 @@ export namespace wails {
 	        this.sidebarSize = source["sidebarSize"];
 	        this.bottomPanelSize = source["bottomPanelSize"];
 	        this.bottomTab = source["bottomTab"];
+	        this.runnerPaths = source["runnerPaths"];
+	        this.runnerOptions = source["runnerOptions"];
 	    }
 	}
 	export class SystemInfoDto {

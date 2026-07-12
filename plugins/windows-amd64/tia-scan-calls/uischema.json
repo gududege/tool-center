@@ -1,0 +1,26 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "Scan Configuration",
+      "label_cn": "扫描配置",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/outputFile",
+          "options": {
+            "saveFilePicker": true
+          }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/scanPaths",
+          "options": {
+            "widget": "select"
+          }
+        }
+      ]
+    }
+  ]
+}

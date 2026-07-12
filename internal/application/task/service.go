@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 	"sync"
 	"time"
 
@@ -36,15 +37,17 @@ type PluginRepository interface {
 
 // Service 任务应用服务
 type Service struct {
-	tasks        domainTask.Repository
-	plugins      PluginRepository
-	runner       ProcessRunner
-	paramBuilder ParameterBuilder
-	eventBus     events.Bus
-	outputsMu    sync.RWMutex
-	outputs      map[string]*output.OutputBuffer
-	maxOutput    int
-	cancels      sync.Map
+	tasks         domainTask.Repository
+	plugins       PluginRepository
+	runner        ProcessRunner
+	paramBuilder  ParameterBuilder
+	eventBus      events.Bus
+	outputsMu     sync.RWMutex
+	outputs       map[string]*output.OutputBuffer
+	maxOutput     int
+	cancels       sync.Map
+	runnerPaths   map[string]string
+	runnerOptions map[string]string
 }
 
 // NewService 创建任务服务
@@ -55,15 +58,19 @@ func NewService(
 	paramBuilder ParameterBuilder,
 	eventBus events.Bus,
 	maxOutput int,
+	runnerPaths map[string]string,
+	runnerOptions map[string]string,
 ) *Service {
 	s := &Service{
-		tasks:        tasks,
-		plugins:      plugins,
-		runner:       runner,
-		paramBuilder: paramBuilder,
-		eventBus:     eventBus,
-		outputs:      make(map[string]*output.OutputBuffer),
-		maxOutput:    maxOutput,
+		tasks:         tasks,
+		plugins:       plugins,
+		runner:        runner,
+		paramBuilder:  paramBuilder,
+		eventBus:      eventBus,
+		outputs:       make(map[string]*output.OutputBuffer),
+		maxOutput:     maxOutput,
+		runnerPaths:   runnerPaths,
+		runnerOptions: runnerOptions,
 	}
 
 	// 设置输出处理器
@@ -85,7 +92,7 @@ func (s *Service) RunPlugin(pluginID string, formData map[string]any) (string, e
 		return "", fmt.Errorf("build arguments: %w", err)
 	}
 
-	slog.Info("run plugin", "pluginId", pluginID, "exe", p.Execution.Executable, "args", args)
+	slog.Info("run plugin", "pluginId", pluginID, "runner", p.Execution.Runner, "target", p.Execution.Target, "args", args)
 
 	// 创建任务
 	task := &domainTask.Task{
@@ -139,7 +146,10 @@ func (s *Service) executeTask(taskID string, p *plugin.Plugin, args []string) {
 	}
 
 	err := s.runner.Start(taskID, domainProcess.StartRequest{
-		Executable:       p.Execution.Executable,
+		Target:           p.Execution.Target,
+		Runner:           p.Execution.Runner,
+		RunnerPath:       s.runnerPaths[p.Execution.Runner],
+		RunnerOptions:    strings.Fields(s.runnerOptions[p.Execution.Runner]),
 		Arguments:        args,
 		WorkingDirectory: p.Execution.WorkingDirectory,
 		Environment:      env,
@@ -182,8 +192,20 @@ func (s *Service) executeTask(taskID string, p *plugin.Plugin, args []string) {
 	s.saveTaskFinalState(taskID, domainTask.Completed, "", func(t *domainTask.Task) {
 		t.ExitCode = &exitCode
 	})
-	s.appendSystemOutput(taskID, fmt.Sprintf("Task completed with exit code %d", exitCode))
-	s.eventBus.Publish(events.TaskCompleted{TaskID: taskID, ExitCode: exitCode})
+
+	t, err := s.tasks.Get(taskID)
+	if err != nil {
+		slog.Warn("executeTask: get task after completion", "id", taskID, "error", err)
+		s.runner.Remove(taskID)
+		return
+	}
+	if t.Status == domainTask.Cancelled {
+		s.appendSystemOutput(taskID, "Task cancelled")
+		s.eventBus.Publish(events.TaskCancelled{TaskID: taskID})
+	} else {
+		s.appendSystemOutput(taskID, fmt.Sprintf("Task completed with exit code %d", exitCode))
+		s.eventBus.Publish(events.TaskCompleted{TaskID: taskID, ExitCode: exitCode})
+	}
 	s.runner.Remove(taskID)
 }
 

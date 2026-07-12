@@ -18,6 +18,10 @@ function mockT(key: string) {
     'theme.light': 'Light',
     'theme.dark': 'Dark',
     'theme.system': 'System',
+    'button.theme_switch': 'Switch theme',
+    'button.theme_light': 'Switch to Light theme',
+    'button.theme_dark': 'Switch to Dark theme',
+    'button.theme_system': 'Switch to System theme',
   }
   return map[key] ?? key
 }
@@ -73,7 +77,7 @@ describe('ThemeToggle', () => {
 
     render(<ThemeToggle />)
 
-    const button = screen.getByTitle('Dark')
+    const button = screen.getByTitle('Switch theme')
     fireEvent.click(button)
 
     expect(screen.getByText('Light')).toBeDefined()
@@ -89,7 +93,7 @@ describe('ThemeToggle', () => {
 
     render(<ThemeToggle />)
 
-    fireEvent.click(screen.getByTitle('Dark'))
+    fireEvent.click(screen.getByTitle('Switch theme'))
     fireEvent.click(screen.getByText('Light'))
 
     expect(saveSettings).toHaveBeenCalledWith({
@@ -106,7 +110,7 @@ describe('ThemeToggle', () => {
 
     render(<ThemeToggle />)
 
-    const button = screen.getByTitle('Dark')
+    const button = screen.getByTitle('Switch theme')
     fireEvent.click(button)
 
     fireEvent.click(screen.getByText('Light'))
@@ -123,7 +127,7 @@ describe('ThemeToggle', () => {
 
     render(<ThemeToggle />)
 
-    fireEvent.click(screen.getByTitle('Dark'))
+    fireEvent.click(screen.getByTitle('Switch theme'))
     expect(screen.queryByText('Light')).toBeTruthy()
 
     fireEvent.click(document.body)

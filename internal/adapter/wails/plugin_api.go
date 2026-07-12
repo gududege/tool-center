@@ -136,7 +136,8 @@ func pluginToFull(p *domainPlugin.Plugin) PluginDto {
 			UISchema: p.Form.UISchema,
 		},
 		Execution: ExecutionDefinitionDto{
-			Exe:              p.Execution.Executable,
+			Target:           p.Execution.Target,
+			Runner:           p.Execution.Runner,
 			WorkingDirectory: p.Execution.WorkingDirectory,
 			Parameters:       params,
 		},

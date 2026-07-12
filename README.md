@@ -20,6 +20,12 @@
 
 ---
 
+## 截图
+
+![主界面截图](docs/screenshot.png)
+
+---
+
 ## 架构
 
 ```
@@ -92,11 +98,15 @@ npm run build
 每个插件是一个独立目录，包含 `plugin.json`、`schema.json`、`uischema.json` 和可执行文件。
 
 ```text
-plugins/my-tool/
-├── plugin.json
-├── schema.json
-├── uischema.json
-└── my-tool.exe
+plugins/
+├── windows-amd64/my-tool/
+│   ├── plugin.json
+│   ├── schema.json
+│   ├── uischema.json
+│   ├── my-tool.exe
+│   └── my-tool.ps1
+├── linux-amd64/my-tool/       # Linux 跨平台
+└── darwin-arm64/my-tool/      # macOS 跨平台
 ```
 
 参考文档：
@@ -105,11 +115,14 @@ plugins/my-tool/
 - [Plugin Authoring Skill](./docs/skill.md)
 - [Plugin Specification](./docs/Plugin%20Specification.md)
 
-示例插件：
+示例插件（以 Windows 为例，各平台均有对应目录）：
 
-- [`plugins/cli-print-demo`](./plugins/cli-print-demo) — 展示所有支持的 RJSF widget。
-- [`plugins/tia-export`](./plugins/tia-export) — 工业自动化导出工具示例。
-- [`plugins/tcping`](./plugins/tcping) — 网络工具示例。
+- [`plugins/windows-amd64/tia-export`](./plugins/windows-amd64/tia-export) — 工业自动化导出工具示例。
+- [`plugins/windows-amd64/tcping`](./plugins/windows-amd64/tcping) — 网络工具示例。
+- [`plugins/windows-amd64/cli-print-binary`](./plugins/windows-amd64/cli-print-binary) — 基础 binary runner 演示。
+- [`plugins/windows-amd64/cli-print-powershell`](./plugins/windows-amd64/cli-print-powershell) — PowerShell runner 演示。
+- [`plugins/windows-amd64/cli-print-python`](./plugins/windows-amd64/cli-print-python) — Python runner 演示。
+- [`plugins/windows-amd64/cli-print-nodejs`](./plugins/windows-amd64/cli-print-nodejs) — Node.js runner 演示。
 
 ---
 

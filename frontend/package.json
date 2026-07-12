@@ -17,6 +17,7 @@
     "@rjsf/shadcn": "^6.6.2",
     "@rjsf/utils": "^6.6.2",
     "@rjsf/validator-ajv8": "^6.6.2",
+    "anser": "^2.3.5",
     "clsx": "^2.0.0",
     "lucide-react": "^1.21.0",
     "react": "^19.0.0",

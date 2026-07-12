@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { MainLayout } from './layouts/MainLayout'
 import { Sidebar } from './features/sidebar'
 import { Workspace } from './features/workspace'
@@ -58,15 +58,24 @@ export default function App() {
     updateLayout({ bottomTab: tab })
   }
 
-  // 面板大小变化 → 保存
-  const handleSidebarResize = (size: { asPercentage: number }) => {
-    if (size.asPercentage > 0) {
+  // 面板大小变化 → 300ms 防抖保存（拖拽中不触发重渲染影响面板内部状态）
+  const sidebarTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const bottomTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  const handleSidebarResize = useCallback((size: { asPercentage: number }) => {
+    if (size.asPercentage <= 0) return
+    if (sidebarTimer.current) clearTimeout(sidebarTimer.current)
+    sidebarTimer.current = setTimeout(() => {
       updateLayout({ sidebarSize: Math.round(size.asPercentage) })
-    }
-  }
-  const handleBottomResize = (size: { asPercentage: number }) => {
-    updateLayout({ bottomPanelSize: Math.round(size.asPercentage) })
-  }
+    }, 300)
+  }, [updateLayout])
+
+  const handleBottomResize = useCallback((size: { asPercentage: number }) => {
+    if (bottomTimer.current) clearTimeout(bottomTimer.current)
+    bottomTimer.current = setTimeout(() => {
+      updateLayout({ bottomPanelSize: Math.round(size.asPercentage) })
+    }, 300)
+  }, [updateLayout])
 
   // 点击任务时切换到 output tab 并显示其输出
   const handleTaskClick = (taskId: string) => {

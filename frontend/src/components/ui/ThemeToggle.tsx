@@ -45,7 +45,7 @@ export function ThemeToggle() {
           e.stopPropagation()
           setOpen(!open)
         }}
-        title={t(`theme.${activeTheme.value}`)}
+        title={t('button.theme_switch')}
       >
         <Icon className="h-3.5 w-3.5" />
         <span className="hidden sm:inline">{t(`theme.${activeTheme.value}`)}</span>
@@ -69,6 +69,7 @@ export function ThemeToggle() {
                 value === currentTheme && 'text-blue-600 dark:text-blue-400',
               )}
               onClick={() => handleSelect(value)}
+              title={t(`button.theme_${value}`)}
             >
               <ItemIcon className="h-3.5 w-3.5" />
               {t(`theme.${value}`)}

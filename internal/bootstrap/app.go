@@ -82,11 +82,11 @@ func Initialize() (*App, error) {
 	// 4. Infrastructure
 	pluginLoader := filesystem.NewLoader()
 	paramBuilder := processInfra.NewParameterBuilder()
-	processRunner := processInfra.NewRunner()
+	processRunner := processInfra.NewRunner(cfg.RunnerPaths, cfg.RunnerOptions)
 
 	// 5. Application Services
 	pluginSvc := appPlugin.NewService(pluginRepo, pluginLoader, eventBus, cfg)
-	taskSvc := appTask.NewService(taskRepo, pluginRepo, processRunner, paramBuilder, eventBus, cfg.MaxOutputLines)
+	taskSvc := appTask.NewService(taskRepo, pluginRepo, processRunner, paramBuilder, eventBus, cfg.MaxOutputLines, cfg.RunnerPaths, cfg.RunnerOptions)
 
 	// 6. Wails APIs
 	pluginApi := wails.NewPluginApi(pluginSvc)

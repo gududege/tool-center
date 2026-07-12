@@ -119,7 +119,7 @@ func (s *Service) SaveHistory(pluginID string, formData map[string]any) error {
 		return err
 	}
 
-	label := fmt.Sprintf("%s %s", time.Now().Format("2006-01-02 15:04:05"), filepath.Base(p.Execution.Executable))
+	label := fmt.Sprintf("%s %s", time.Now().Format("2006-01-02 15:04:05"), filepath.Base(p.Execution.Target))
 	newEntry := HistoryEntry{
 		Timestamp: time.Now(),
 		Label:     label,

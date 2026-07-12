@@ -2,7 +2,7 @@
 
 **Project:** CLI Tool Center  
 **Version:** 1.0  
-**Last Updated:** 2026-06-23
+**Last Updated:** 2026-07-12
 
 ---
 
@@ -43,7 +43,8 @@ plugins/<plugin-id>/
     "uischema": "uischema.json"
   },
   "execution": {
-    "exe": "<executable>",
+    "target": "<executable>",
+    "runner": "binary",
     "parameters": []
   }
 }
@@ -71,35 +72,35 @@ plugins/<plugin-id>/
 
 ### 4.1 本地自定义（优先使用）
 
-| 效果 | uischema Control options |
-| --- | --- |
-| 目录选择 | `{ "folderPicker": true }` |
-| 文件选择 | `{ "filePicker": true }` |
+| 效果     | uischema Control options     |
+| -------- | ---------------------------- |
+| 目录选择 | `{ "folderPicker": true }`   |
+| 文件选择 | `{ "filePicker": true }`     |
 | 保存文件 | `{ "saveFilePicker": true }` |
 
 ### 4.2 RJSF 内置 widget
 
-| 效果 | options |
-| --- | --- |
-| 多行文本 | `{ "widget": "textarea" }` |
-| 单选按钮 | `{ "widget": "radio" }` |
-| 下拉选择 | `{ "widget": "select" }` |
-| 隐藏字段 | `{ "widget": "hidden" }` |
-| 范围滑块 | `{ "widget": "range" }` |
-| 数字步进 | `{ "widget": "updown" }` |
+| 效果     | options                       |
+| -------- | ----------------------------- |
+| 多行文本 | `{ "widget": "textarea" }`    |
+| 单选按钮 | `{ "widget": "radio" }`       |
+| 下拉选择 | `{ "widget": "select" }`      |
+| 隐藏字段 | `{ "widget": "hidden" }`      |
+| 范围滑块 | `{ "widget": "range" }`       |
+| 数字步进 | `{ "widget": "updown" }`      |
 | 密码输入 | `{ "inputType": "password" }` |
 
 ### 4.3 Format 自动控件
 
-| Format | 控件 |
-| --- | --- |
-| `email` | email |
-| `uri` / `url` | url |
-| `date` | date |
-| `date-time` | datetime-local |
-| `time` | time |
-| `color` | color |
-| `password` | password |
+| Format        | 控件           |
+| ------------- | -------------- |
+| `email`       | email          |
+| `uri` / `url` | url            |
+| `date`        | date           |
+| `date-time`   | datetime-local |
+| `time`        | time           |
+| `color`       | color          |
+| `password`    | password       |
 
 ---
 
@@ -147,6 +148,8 @@ plugins/<plugin-id>/
 
 ## 6. uischema.json 模板
 
+**所有字段必须在 Group 内**（包括单字段），否则会被排到所有 Group 之后。
+
 ```json
 {
   "type": "VerticalLayout",
@@ -157,12 +160,18 @@ plugins/<plugin-id>/
       "label_cn": "分组名称",
       "elements": [
         { "type": "Control", "scope": "#/properties/fieldA" },
-        { "type": "Control", "scope": "#/properties/fieldB", "options": { "widget": "radio" } }
+        {
+          "type": "Control",
+          "scope": "#/properties/fieldB",
+          "options": { "widget": "radio" }
+        }
       ]
     }
   ]
 }
 ```
+
+配合 `oneOf` / `dependencies` 时，**每个分支的字段仍需分别放在 Group 内**。被条件过滤为空的 Group 会自动隐藏。
 
 ---
 
@@ -193,6 +202,7 @@ wails generate module
 - `switch` 在 false 时不输出任何参数；需要显式 false 时用 `bool-option` 或 `dual-switch`。
 - 数组默认渲染为复选框组；需要下拉多选用 `options.widget: select`。
 - 表单校验通过后才会保存历史，保存历史不依赖运行结果。
+- **所有字段必须在 Group 内**，即使是单字段（如 discriminator selector），否则会被排到所有 Group 之后。空 Group（因 `oneOf`/`dependencies` 条件导致字段不存在）会自动隐藏。
 
 ---
 

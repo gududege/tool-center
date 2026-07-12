@@ -1,0 +1,48 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "Input & Output",
+      "label_cn": "输入与输出",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/inputFile",
+          "options": {
+            "filePicker": true
+          }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/outputFile",
+          "options": {
+            "saveFilePicker": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Tree Options",
+      "label_cn": "树选项",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/entry"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/type",
+          "options": {
+            "widget": "select"
+          }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/level"
+        }
+      ]
+    }
+  ]
+}

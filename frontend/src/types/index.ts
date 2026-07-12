@@ -46,7 +46,8 @@ export interface FormDefinitionDto {
 }
 
 export interface ExecutionDefinitionDto {
-  exe: string
+  target: string
+  runner: string
   workingDirectory?: string
   parameters?: ParameterMappingDto[]
 }
@@ -105,6 +106,8 @@ export interface SettingsDto {
   sidebarSize: number
   bottomPanelSize: number
   bottomTab: string
+  runnerPaths?: Record<string, string>
+  runnerOptions?: Record<string, string>
 }
 
 // --- System ---

@@ -103,11 +103,17 @@
     "execution": {
       "type": "object",
       "description": "CLI 执行配置。",
-      "required": ["exe"],
+      "required": ["target"],
       "properties": {
-        "exe": {
+        "target": {
           "type": "string",
-          "description": "可执行文件路径，相对插件目录或绝对路径。"
+          "description": "目标文件路径，相对插件目录或绝对路径。"
+        },
+        "runner": {
+          "type": "string",
+          "description": "运行器类型，决定如何执行 target。省略时默认 binary（直接执行）。",
+          "enum": ["binary", "cmd", "bat", "powershell", "sh", "python", "nodejs"],
+          "default": "binary"
         },
         "workingDirectory": {
           "type": "string",

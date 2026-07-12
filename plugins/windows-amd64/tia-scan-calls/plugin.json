@@ -1,0 +1,44 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schemaVersion": "1.0",
+  "id": "tia-scan-calls",
+  "name": "TIA Portal Scan Calls",
+  "name_cn": "TIA Portal 调用扫描",
+  "description": "Scan TIA Portal exported source files (UDTs, blocks) and generate a JSON call graph showing cross-references between blocks. Typically used after tia-export.",
+  "description_cn": "扫描 TIA Portal 导出的源文件（UDT、块），生成包含块间交叉引用的 JSON 调用关系图。通常在 tia-export 之后使用。",
+  "version": "1.0.0",
+  "author": "CLI Tool Center",
+  "icon": "",
+  "navigation": {
+    "group": ["Industrial Automation", "TIA Portal"],
+    "group_cn": ["工业自动化", "TIA Portal"],
+    "order": 2
+  },
+  "form": {
+    "schema": "schema.json",
+    "uischema": "uischema.json"
+  },
+  "execution": {
+    "target": "tia-scan-calls.ps1",
+    "runner": "powershell",
+    "parameters": [
+      {
+        "field": "outputFile",
+        "kind": "option",
+        "flag": "-OutputFile"
+      },
+      {
+        "field": "scanPaths",
+        "kind": "option-array",
+        "flag": "-ScanPaths",
+        "style": "repeat"
+      }
+    ]
+  },
+  "output": {
+    "type": "json"
+  },
+  "capabilities": [
+    "file-output"
+  ]
+}

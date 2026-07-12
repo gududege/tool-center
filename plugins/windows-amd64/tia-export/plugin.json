@@ -20,7 +20,8 @@
     "uischema": "uischema.json"
   },
   "execution": {
-    "exe": "tia-export.exe",
+    "target": "tia-export.exe",
+    "runner": "binary",
     "parameters": [
       {
         "field": "indir",

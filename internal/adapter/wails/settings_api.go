@@ -30,6 +30,8 @@ func (a *SettingsApi) GetSettings() (*SettingsDto, error) {
 		SidebarSize:      s.SidebarSize,
 		BottomPanelSize:  s.BottomPanelSize,
 		BottomTab:        s.BottomTab,
+		RunnerPaths:      s.RunnerPaths,
+		RunnerOptions:    s.RunnerOptions,
 	}, nil
 }
 
@@ -51,11 +53,19 @@ func (a *SettingsApi) SaveSettings(dto SettingsDto) error {
 		SidebarSize:       dto.SidebarSize,
 		BottomPanelSize:   dto.BottomPanelSize,
 		BottomTab:         dto.BottomTab,
+		RunnerPaths:       dto.RunnerPaths,
+		RunnerOptions:     dto.RunnerOptions,
 		// WindowWidth/WindowHeight 不在 DTO 里（仅退出时由 main.go OnShutdown
 		// 经 SettingsSvc.SaveSettings 直存）。前端走本方法保存时必须回填 current
 		// 的窗口尺寸，否则会把 OnShutdown 存好的值清零，导致下次启动回退默认尺寸。
 		WindowWidth:  current.WindowWidth,
 		WindowHeight: current.WindowHeight,
+	}
+	if s.RunnerPaths == nil {
+		s.RunnerPaths = current.RunnerPaths
+	}
+	if s.RunnerOptions == nil {
+		s.RunnerOptions = current.RunnerOptions
 	}
 	return a.service.SaveSettings(s)
 }

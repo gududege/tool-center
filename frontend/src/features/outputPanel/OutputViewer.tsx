@@ -3,6 +3,7 @@ import { useOutputStore } from '../../stores/outputStore'
 import { ScrollArea } from '../../components/ui/ScrollArea'
 import { Button } from '../../components/ui/Button'
 import { useT } from '../../contexts/TranslationContext'
+import { ansiToHtml } from '../../lib/ansiToHtml'
 import type { OutputLine } from '../../types'
 
 interface OutputViewerProps {
@@ -49,10 +50,11 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
           variant="ghost"
           size="sm"
           onClick={() => setAutoScroll(!autoScroll)}
+          title={t('button.auto_scroll')}
         >
           {autoScroll ? t('output.auto_scroll') : t('output.manual_scroll')}
         </Button>
-        <Button variant="ghost" size="sm" onClick={handleCopy}>
+        <Button variant="ghost" size="sm" onClick={handleCopy} title={t('button.copy_output')}>
           {t('output.copy')}
         </Button>
       </div>
@@ -77,7 +79,7 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
                 <span className="text-neutral-600">
                   [{line.timestamp?.slice(11, 19) ?? '--:--:--'}]
                 </span>{' '}
-                {line.message}
+                <span dangerouslySetInnerHTML={{ __html: ansiToHtml(line.message) }} />
               </div>
             ))
           )}

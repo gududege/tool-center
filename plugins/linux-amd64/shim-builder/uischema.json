@@ -1,0 +1,78 @@
+{
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "Command",
+      "label_cn": "命令",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/command" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Target Configuration",
+      "label_cn": "目标配置",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/output", "options": { "saveFilePicker": true } },
+        { "type": "Control", "scope": "#/properties/mode" },
+        { "type": "Control", "scope": "#/properties/entry", "options": { "filePicker": true } },
+        { "type": "Control", "scope": "#/properties/runner" },
+        { "type": "Control", "scope": "#/properties/workingDir", "options": { "folderPicker": true } },
+        { "type": "Control", "scope": "#/properties/args" },
+        { "type": "Control", "scope": "#/properties/overrideArgs" },
+        { "type": "Control", "scope": "#/properties/env" },
+        { "type": "Control", "scope": "#/properties/overrideEnv" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Payload (Bundle Mode)",
+      "label_cn": "负载（Bundle 模式）",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/payload", "options": { "folderPicker": true } },
+        { "type": "Control", "scope": "#/properties/extractPolicy" },
+        { "type": "Control", "scope": "#/properties/extractPath" },
+        { "type": "Control", "scope": "#/properties/cleanup" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Metadata",
+      "label_cn": "元数据",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/icon", "options": { "filePicker": true } },
+        { "type": "Control", "scope": "#/properties/elevate" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Config File",
+      "label_cn": "配置文件",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/configFile", "options": { "filePicker": true } }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Inspect Options",
+      "label_cn": "检查选项",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/bundlePath", "options": { "filePicker": true } },
+        { "type": "Control", "scope": "#/properties/json" },
+        { "type": "Control", "scope": "#/properties/config" },
+        { "type": "Control", "scope": "#/properties/manifest" },
+        { "type": "Control", "scope": "#/properties/footer" }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Extract Options",
+      "label_cn": "提取选项",
+      "elements": [
+        { "type": "Control", "scope": "#/properties/bundlePath", "options": { "filePicker": true } },
+        { "type": "Control", "scope": "#/properties/outputDir", "options": { "folderPicker": true } }
+      ]
+    }
+  ]
+}

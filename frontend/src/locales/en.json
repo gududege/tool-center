@@ -51,5 +51,33 @@
   "common.search": "Search...",
   "common.language": "Language",
   "common.lang.en": "English",
-  "common.lang.zh": "中文"
+  "common.lang.zh": "中文",
+
+  "settings.title": "Settings",
+  "settings.close": "Close",
+  "settings.open": "Settings",
+
+  "settings.fields.theme": "Theme",
+  "settings.fields.form_theme": "Form Theme",
+  "settings.fields.language": "Language",
+  "settings.fields.plugin_directory": "Plugin Directory",
+  "settings.fields.runner_paths": "Interpreter Paths",
+  "settings.fields.runner_options": "Interpreter Options",
+  "settings.fields.runner_options_desc": "Arguments inserted between interpreter and target script",
+
+  "button.tasks_tab": "Show tasks panel",
+  "button.output_tab": "Show output panel",
+  "button.theme_switch": "Switch theme",
+  "button.theme_light": "Switch to Light theme",
+  "button.theme_dark": "Switch to Dark theme",
+  "button.theme_system": "Switch to System theme",
+  "button.auto_scroll": "Toggle auto-scroll",
+  "button.copy_output": "Copy output to clipboard",
+  "button.stop_task": "Stop running task",
+  "button.view_output": "View task output",
+  "button.delete_task": "Delete task",
+  "button.close_settings": "Close settings",
+  "button.save_settings": "Save Settings",
+  "button.reset_settings": "Reset to Defaults",
+  "button.reset_settings_confirm": "Reset all settings to default values?"
 }

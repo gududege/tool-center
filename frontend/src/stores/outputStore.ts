@@ -8,7 +8,6 @@ interface OutputState {
   appendOutputLine: (taskId: string, line: OutputLine) => void
   setOutput: (taskId: string, lines: OutputLine[]) => void
   clearOutput: (taskId: string) => void
-  getOutput: (taskId: string) => OutputLine[]
 }
 
 const MAX_OUTPUT_LINES = 10000
@@ -58,9 +57,5 @@ export const useOutputStore = create<OutputState>((set, get) => ({
       delete outputs[taskId]
       return { outputs }
     })
-  },
-
-  getOutput: (taskId: string) => {
-    return get().outputs[taskId] ?? []
   },
 }))

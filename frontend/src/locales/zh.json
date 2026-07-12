@@ -51,5 +51,33 @@
   "common.search": "搜索...",
   "common.language": "语言",
   "common.lang.en": "English",
-  "common.lang.zh": "中文"
+  "common.lang.zh": "中文",
+
+  "settings.title": "设置",
+  "settings.close": "关闭",
+  "settings.open": "设置",
+
+  "settings.fields.theme": "主题",
+  "settings.fields.form_theme": "表单主题",
+  "settings.fields.language": "语言",
+  "settings.fields.plugin_directory": "插件目录",
+  "settings.fields.runner_paths": "解释器路径",
+  "settings.fields.runner_options": "解释器选项",
+  "settings.fields.runner_options_desc": "插入在解释器和目标脚本之间的参数",
+
+  "button.tasks_tab": "显示任务面板",
+  "button.output_tab": "显示输出面板",
+  "button.theme_switch": "切换主题",
+  "button.theme_light": "切换到浅色主题",
+  "button.theme_dark": "切换到深色主题",
+  "button.theme_system": "切换到系统主题",
+  "button.auto_scroll": "切换自动滚动",
+  "button.copy_output": "复制输出到剪贴板",
+  "button.stop_task": "停止运行中的任务",
+  "button.view_output": "查看任务输出",
+  "button.delete_task": "删除任务",
+  "button.close_settings": "关闭设置",
+  "button.save_settings": "保存设置",
+  "button.reset_settings": "恢复默认设置",
+  "button.reset_settings_confirm": "将所有设置恢复为默认值？"
 }

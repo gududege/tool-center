@@ -51,7 +51,8 @@ type FormDefinitionDto struct {
 
 // ExecutionDefinitionDto 执行定义 DTO
 type ExecutionDefinitionDto struct {
-	Exe              string                `json:"exe"`
+	Target           string                `json:"target"`
+	Runner           string                `json:"runner,omitempty"`
 	WorkingDirectory string                `json:"workingDirectory,omitempty"`
 	Parameters       []ParameterMappingDto `json:"parameters,omitempty"`
 }
@@ -89,14 +90,16 @@ type OutputEventDto struct {
 
 // SettingsDto 配置 DTO
 type SettingsDto struct {
-	Theme            string `json:"theme"`
-	FormTheme        string `json:"formTheme,omitempty"`
-	PluginDirectory  string `json:"pluginDirectory"`
-	Language         string `json:"language,omitempty"`
-	SidebarCollapsed bool   `json:"sidebarCollapsed"`
-	SidebarSize      int    `json:"sidebarSize"`
-	BottomPanelSize  int    `json:"bottomPanelSize"`
-	BottomTab        string `json:"bottomTab"`
+	Theme            string            `json:"theme"`
+	FormTheme        string            `json:"formTheme,omitempty"`
+	PluginDirectory  string            `json:"pluginDirectory"`
+	Language         string            `json:"language,omitempty"`
+	SidebarCollapsed bool              `json:"sidebarCollapsed"`
+	SidebarSize      int               `json:"sidebarSize"`
+	BottomPanelSize  int               `json:"bottomPanelSize"`
+	BottomTab        string            `json:"bottomTab"`
+	RunnerPaths      map[string]string `json:"runnerPaths,omitempty"`
+	RunnerOptions    map[string]string `json:"runnerOptions,omitempty"`
 }
 
 // SystemInfoDto 系统信息 DTO

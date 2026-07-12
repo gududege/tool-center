@@ -25,7 +25,7 @@ type callbackMessage struct {
 func loadTiaExport(t *testing.T) *domainPlugin.Plugin {
 	t.Helper()
 	// tia-export 目录相对仓库根。go test 的工作目录是包目录。
-	dir, err := filepath.Abs(filepath.Join("..", "..", "..", "plugins"))
+	dir, err := filepath.Abs(filepath.Join("..", "..", "..", "plugins", "windows-amd64"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestPluginDto_RawMessageSurvivesWailsMarshal(t *testing.T) {
 	order := propertyOrderFromBytes(t, top.Result.Form.Schema)
 
 	want := []string{
-		"indir", "outdir", "exportMode", "keepFolderStructure", "maxWorkers",
+		"indir", "outdir", "exportMode", "keepFolderStructure", "incrementalUpdate", "maxWorkers",
 		"projectFilter", "sclFormat", "stlFormat", "ladFormat", "dbFormat",
 		"udtFormat", "safetyDbFormat", "safetyUdtFormat", "umacUser", "umacPassword",
 		"portalMode", "logfile", "loglevel",

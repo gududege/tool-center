@@ -111,12 +111,13 @@ function TreeNode({ node, depth, onSelect }: TreeNodeProps) {
 
 export function Sidebar() {
   const { t, lang } = useT()
-  const { plugins, fetchPlugins } = usePluginStore()
+  const { plugins } = usePluginStore()
+  const { reloadPlugins } = usePluginStore()
   const { addTab } = useTabStore()
   const [menuTree, setMenuTree] = useState<MenuNode[]>([])
 
   useEffect(() => {
-    fetchPlugins()
+    usePluginStore.getState().fetchPlugins()
   }, [])
 
   useEffect(() => {
@@ -143,7 +144,7 @@ export function Sidebar() {
         <span className="text-xs font-semibold uppercase text-neutral-500">{t('sidebar.title')}</span>
         <button
           className="text-xs text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
-          onClick={() => usePluginStore.getState().reloadPlugins()}
+          onClick={() => reloadPlugins()}
           title={t('sidebar.reload')}
         >
           ↻

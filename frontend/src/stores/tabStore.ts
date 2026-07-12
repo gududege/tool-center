@@ -23,18 +23,19 @@ export const useTabStore = create<TabState>((set, get) => ({
     const state = get()
     const id = tab.id || `tab-${state._counter + 1}`
     const newTab = { ...tab, id }
-    set((s) => {
-      if (!tab.id) s._counter += 1
-      const existing = s.tabs.find(
-        (t) => t.pluginId === tab.pluginId && t.title === tab.title && !t.taskId,
-      )
-      if (existing) {
-        return { activeTabId: existing.id }
-      }
-      return {
-        tabs: [...s.tabs, newTab],
-        activeTabId: id,
-      }
+
+    const existing = state.tabs.find(
+      (t) => t.pluginId === tab.pluginId,
+    )
+    if (existing) {
+      set({ activeTabId: existing.id })
+      return existing.id
+    }
+
+    set({
+      _counter: state._counter + (tab.id ? 0 : 1),
+      tabs: [...state.tabs, newTab],
+      activeTabId: id,
     })
     return id
   },

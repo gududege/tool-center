@@ -31,7 +31,7 @@ func TestLoader_Load_ValidPlugin(t *testing.T) {
 			"order": 100,
 		},
 		"execution": map[string]any{
-			"exe": "./tool.exe",
+			"target": "./tool.exe",
 		},
 	})
 
@@ -55,8 +55,8 @@ func TestLoader_Load_ValidPlugin(t *testing.T) {
 	if p.Metadata.Version != "1.0.0" {
 		t.Errorf("Version = %s, want 1.0.0", p.Metadata.Version)
 	}
-	if p.Execution.Executable != filepath.Join(pluginDir, "tool.exe") {
-		t.Errorf("Executable = %s, want %s", p.Execution.Executable, filepath.Join(pluginDir, "tool.exe"))
+	if p.Execution.Target != filepath.Join(pluginDir, "tool.exe") {
+		t.Errorf("Target = %s, want %s", p.Execution.Target, filepath.Join(pluginDir, "tool.exe"))
 	}
 	if len(p.Navigation.Group) != 2 || p.Navigation.Group[0] != "Tools" || p.Navigation.Group[1] != "Test" {
 		t.Errorf("Navigation.Group = %v, want [Tools Test]", p.Navigation.Group)
@@ -96,7 +96,7 @@ func TestLoader_Load_WithSchema(t *testing.T) {
 			"uischema": "./uischema.json",
 		},
 		"execution": map[string]any{
-			"exe": "./tool.exe",
+			"target": "./tool.exe",
 		},
 	})
 
@@ -209,7 +209,7 @@ func TestLoader_Load_WithEnvironment(t *testing.T) {
 		"name":          "Env Plugin",
 		"navigation":    map[string]any{"group": []string{"Tools"}, "order": 1},
 		"execution": map[string]any{
-			"exe": "./tool.exe",
+			"target": "./tool.exe",
 			"environment": map[string]string{
 				"LOG_LEVEL": "debug",
 				"MODE":      "test",
@@ -244,7 +244,7 @@ func TestLoader_Load_WithParameters(t *testing.T) {
 		"name":          "Param Plugin",
 		"navigation":    map[string]any{"group": []string{"Tools"}, "order": 1},
 		"execution": map[string]any{
-			"exe": "./tool.exe",
+			"target": "./tool.exe",
 			"parameters": []map[string]any{
 				{"field": "project", "kind": "option", "flag": "--project"},
 				{"field": "overwrite", "kind": "switch", "flag": "--overwrite"},
@@ -319,7 +319,7 @@ func TestLoader_Load_MissingRequiredFields(t *testing.T) {
 		"schemaVersion": "1.0",
 		"name":          "No ID",
 		"navigation":    map[string]any{"group": []string{"Tools"}, "order": 1},
-		"execution":     map[string]any{"exe": "./tool.exe"},
+		"execution":     map[string]any{"target": "./tool.exe"},
 	})
 
 	loader := NewLoader()
@@ -345,7 +345,7 @@ func TestLoader_Load_MultiplePlugins(t *testing.T) {
 			"id":            id,
 			"name":          id,
 			"navigation":    map[string]any{"group": []string{"Tools"}, "order": 1},
-			"execution":     map[string]any{"exe": "./tool.exe"},
+			"execution":     map[string]any{"target": "./tool.exe"},
 		})
 	}
 
@@ -373,7 +373,7 @@ func TestLoader_Load_SkipNonDirectories(t *testing.T) {
 		"id":            "valid-plugin",
 		"name":          "Valid",
 		"navigation":    map[string]any{"group": []string{"Tools"}, "order": 1},
-		"execution":     map[string]any{"exe": "./tool.exe"},
+		"execution":     map[string]any{"target": "./tool.exe"},
 	})
 
 	loader := NewLoader()

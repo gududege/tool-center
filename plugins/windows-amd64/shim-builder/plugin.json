@@ -1,0 +1,57 @@
+{
+  "$schema": "../plugin.schema.json",
+  "schemaVersion": "1.0",
+  "id": "shim-builder",
+  "name": "Shim Builder",
+  "name_cn": "Shim 构建器",
+  "description": "Create, inspect, and extract shim programs. Supports build (external/bundle/hybrid), inspect (view config/manifest/footer), and extract (dump all sections).",
+  "description_cn": "创建、检查和提取 shim 程序。支持 build（external/bundle/hybrid）、inspect（查看配置/清单/尾部）和 extract（导出所有部分）。",
+  "version": "1.0.0",
+  "author": "Shim Builder",
+  "homepage": "",
+  "icon": "",
+  "navigation": {
+    "group": ["System Utils", "Shim Builder"],
+    "group_cn": ["系统工具", "Shim 构建器"],
+    "order": 1
+  },
+  "form": {
+    "schema": "schema.json",
+    "uischema": "uischema.json"
+  },
+  "execution": {
+    "target": "shim-builder.exe",
+    "parameters": [
+      { "field": "command",        "kind": "argument" },
+      { "field": "bundlePath",     "kind": "argument" },
+      { "field": "output",         "kind": "option",       "flag": "-o" },
+      { "field": "mode",           "kind": "option",       "flag": "-m" },
+      { "field": "entry",          "kind": "option",       "flag": "-e" },
+      { "field": "runner",         "kind": "option",       "flag": "-r" },
+      { "field": "args",           "kind": "option-array", "flag": "-a",         "style": "repeat" },
+      { "field": "workingDir",     "kind": "option",       "flag": "-w" },
+      { "field": "env",            "kind": "option-array", "flag": "-E",         "style": "repeat" },
+      { "field": "overrideArgs",   "kind": "switch",       "flag": "--override-args" },
+      { "field": "overrideEnv",    "kind": "switch",       "flag": "--override-env" },
+      { "field": "payload",        "kind": "option",       "flag": "-p" },
+      { "field": "extractPolicy",  "kind": "option",       "flag": "--extract-policy" },
+      { "field": "extractPath",    "kind": "option",       "flag": "--extract-path" },
+      { "field": "cleanup",        "kind": "switch",       "flag": "--cleanup" },
+      { "field": "icon",           "kind": "option",       "flag": "--icon" },
+      { "field": "elevate",        "kind": "switch",       "flag": "--elevate" },
+      { "field": "configFile",     "kind": "option",       "flag": "-c" },
+      { "field": "json",           "kind": "switch",       "flag": "-j" },
+      { "field": "config",         "kind": "switch",       "flag": "--config" },
+      { "field": "manifest",       "kind": "switch",       "flag": "--manifest" },
+      { "field": "footer",         "kind": "switch",       "flag": "--footer" },
+      { "field": "outputDir",      "kind": "option",       "flag": "-o" }
+    ]
+  },
+  "output": {
+    "type": "text"
+  },
+  "capabilities": [
+    "file-input",
+    "file-output"
+  ]
+}

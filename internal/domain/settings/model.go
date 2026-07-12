@@ -18,6 +18,8 @@ type Settings struct {
 	BottomTab         string
 	WindowWidth       int
 	WindowHeight      int
+	RunnerPaths       map[string]string
+	RunnerOptions     map[string]string
 }
 
 // RuntimeState 运行时状态
@@ -44,5 +46,18 @@ func DefaultSettings() *Settings {
 		BottomTab:         "tasks",
 		WindowWidth:       1200,
 		WindowHeight:      800,
+		RunnerPaths: map[string]string{
+			"cmd":        "cmd",
+			"bat":        "cmd",
+			"powershell": "powershell",
+			"sh":         "bash",
+			"python":     "python",
+			"nodejs":     "node",
+		},
+		RunnerOptions: map[string]string{
+			"cmd":        "/C",
+			"bat":        "/C",
+			"powershell": "-ExecutionPolicy Bypass -File",
+		},
 	}
 }

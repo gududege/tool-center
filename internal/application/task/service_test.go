@@ -79,7 +79,7 @@ func (s *stubRunner) Start(processID string, req domainProcess.StartRequest) err
 	s.started[processID] = true
 	s.mu.Unlock()
 	if s.handler != nil {
-		s.handler(processID, "stub running: "+req.Executable, "stdout")
+		s.handler(processID, "stub running: "+req.Target, "stdout")
 	}
 	return nil
 }
@@ -146,7 +146,8 @@ func newStubPlugin() *plugin.Plugin {
 		},
 		Navigation: plugin.Navigation{Group: []string{"Test"}, Order: 1},
 		Execution: plugin.ExecutionDefinition{
-			Executable: "echo",
+			Target: "echo",
+			Runner: "binary",
 			Parameters: []plugin.ParameterMapping{
 				{Field: "msg", Kind: plugin.ArgumentKind},
 			},
@@ -184,6 +185,8 @@ func TestService_RunPlugin(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, err := svc.RunPlugin("test-plugin", map[string]any{"msg": "hello"})
@@ -216,6 +219,8 @@ func TestService_RunPlugin_PluginNotFound(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	_, err := svc.RunPlugin("nonexistent", nil)
@@ -232,6 +237,8 @@ func TestService_GetTask_NotFound(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	_, err := svc.GetTask("nonexistent")
@@ -248,6 +255,8 @@ func TestService_ListTasks(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	tasks, _ := svc.ListTasks()
@@ -273,6 +282,8 @@ func TestService_CancelTask(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, _ := svc.RunPlugin("test-plugin", nil)
@@ -296,6 +307,8 @@ func TestService_CancelTask_AlreadyFinished(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, _ := svc.RunPlugin("test-plugin", nil)
@@ -316,6 +329,8 @@ func TestService_DeleteTask(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, _ := svc.RunPlugin("test-plugin", nil)
@@ -340,6 +355,8 @@ func TestService_GetTaskOutput(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, _ := svc.RunPlugin("test-plugin", nil)
@@ -362,6 +379,8 @@ func TestService_GetTaskOutput_NotFound(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	_, err := svc.GetTaskOutput("nonexistent")
@@ -378,6 +397,8 @@ func TestService_RunPlugin_ProcessStartFailure(t *testing.T) {
 		&stubParamBuilder{},
 		&eventCollector{},
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, err := svc.RunPlugin("test-plugin", nil)
@@ -403,6 +424,8 @@ func TestService_EventPublished(t *testing.T) {
 		&stubParamBuilder{},
 		collector,
 		1000,
+		nil,
+		nil,
 	)
 
 	taskID, _ := svc.RunPlugin("test-plugin", nil)

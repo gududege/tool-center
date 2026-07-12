@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Shim Builder",
+  "title_cn": "Shim 构建器",
+  "description": "Create, inspect, and extract shim programs",
+  "description_cn": "创建、检查和提取 shim 程序",
+  "type": "object",
+  "required": ["command"],
+  "properties": {
+    "command": {
+      "type": "string",
+      "title": "Command",
+      "title_cn": "命令",
+      "oneOf": [
+        { "const": "build", "title": "Build", "title_cn": "构建" },
+        { "const": "inspect", "title": "Inspect", "title_cn": "检查" },
+        { "const": "extract", "title": "Extract", "title_cn": "提取" }
+      ],
+      "default": "build"
+    }
+  },
+  "dependencies": {
+    "command": {
+      "oneOf": [
+        {
+          "properties": {
+            "command": { "enum": ["build"] },
+            "output": {
+              "type": "string",
+              "title": "Output Path",
+              "title_cn": "输出路径",
+              "description": "Output path for the shim program",
+              "description_cn": "shim 程序的输出路径"
+            },
+            "mode": {
+              "type": "string",
+              "title": "Runtime Mode",
+              "title_cn": "运行模式",
+              "description": "Runtime mode: external (stub+config), bundle (single-file), hybrid (embedded config + external target)",
+              "description_cn": "运行模式：external（桩+配置文件）、bundle（单文件）、hybrid（嵌入配置+外部目标）",
+              "enum": ["external", "bundle", "hybrid"],
+              "default": "external"
+            },
+            "entry": {
+              "type": "string",
+              "title": "Target Entry",
+              "title_cn": "目标入口",
+              "description": "Target executable path (required for all modes)",
+              "description_cn": "目标可执行文件路径（所有模式都需要）"
+            },
+            "runner": {
+              "type": "string",
+              "title": "Entry Runner",
+              "title_cn": "入口运行器",
+              "description": "How the target entry is launched",
+              "description_cn": "目标入口的启动方式",
+              "enum": ["binary", "cmd", "bat", "powershell", "bash"],
+              "default": "binary"
+            },
+            "workingDir": {
+              "type": "string",
+              "title": "Working Directory",
+              "title_cn": "工作目录",
+              "description": "Working directory for the target",
+              "description_cn": "目标的工作目录"
+            },
+            "args": {
+              "type": "array",
+              "title": "Target Arguments",
+              "title_cn": "目标参数",
+              "description": "Arguments to pass to the target (repeatable)",
+              "description_cn": "传递给目标的参数（可重复）",
+              "items": { "type": "string" }
+            },
+            "overrideArgs": {
+              "type": "boolean",
+              "title": "Override Args",
+              "title_cn": "覆盖参数",
+              "description": "Only use config arguments; ignore user-supplied arguments at runtime",
+              "description_cn": "仅使用配置参数，运行时忽略用户输入参数",
+              "default": false
+            },
+            "env": {
+              "type": "array",
+              "title": "Environment Variables",
+              "title_cn": "环境变量",
+              "description": "Environment variables in KEY=VALUE format (repeatable)",
+              "description_cn": "环境变量，KEY=VALUE 格式（可重复）",
+              "items": { "type": "string" }
+            },
+            "overrideEnv": {
+              "type": "boolean",
+              "title": "Override Env",
+              "title_cn": "覆盖环境变量",
+              "description": "Only use config environment variables; ignore inherited environment",
+              "description_cn": "仅使用配置环境变量，忽略继承的环境",
+              "default": false
+            },
+            "payload": {
+              "type": "string",
+              "title": "Payload Directory",
+              "title_cn": "负载目录",
+              "description": "Payload directory to embed (bundle mode only); auto-archived as zip/tar.gz",
+              "description_cn": "要嵌入的负载目录（仅 bundle 模式）；自动打包为 zip/tar.gz"
+            },
+            "extractPolicy": {
+              "type": "string",
+              "title": "Extraction Policy",
+              "title_cn": "提取策略",
+              "description": "Where to extract bundled payload at runtime",
+              "description_cn": "运行时提取捆绑负载的位置",
+              "enum": ["self", "temp", "custom"],
+              "default": "self"
+            },
+            "extractPath": {
+              "type": "string",
+              "title": "Custom Extract Path",
+              "title_cn": "自定义提取路径",
+              "description": "Custom extraction path (only used when extract-policy is 'custom')",
+              "description_cn": "自定义提取路径（仅 extract-policy 为 'custom' 时使用）"
+            },
+            "cleanup": {
+              "type": "boolean",
+              "title": "Cleanup on Exit",
+              "title_cn": "退出时清理",
+              "description": "Clean up extracted files on exit",
+              "description_cn": "退出时清理提取的文件",
+              "default": false
+            },
+            "icon": {
+              "type": "string",
+              "title": "Icon File (.ico)",
+              "title_cn": "图标文件 (.ico)",
+              "description": "Path to .ico file (Windows only)",
+              "description_cn": ".ico 图标文件路径（仅 Windows）"
+            },
+            "elevate": {
+              "type": "boolean",
+              "title": "UAC Elevation",
+              "title_cn": "UAC 提权",
+              "description": "Request administrator privileges (Windows only)",
+              "description_cn": "请求管理员权限（仅 Windows）",
+              "default": false
+            },
+            "configFile": {
+              "type": "string",
+              "title": "Config File",
+              "title_cn": "配置文件",
+              "description": "Load base config from JSON file (CLI options override)",
+              "description_cn": "从 JSON 文件加载基础配置（CLI 选项会覆盖）"
+            }
+          },
+          "required": ["output", "entry"]
+        },
+        {
+          "properties": {
+            "command": { "enum": ["inspect"] },
+            "bundlePath": {
+              "type": "string",
+              "title": "Bundle Path",
+              "title_cn": "捆绑包路径",
+              "description": "Path to the shim program to inspect",
+              "description_cn": "要检查的 shim 程序路径"
+            },
+            "json": {
+              "type": "boolean",
+              "title": "JSON Output",
+              "title_cn": "JSON 输出",
+              "description": "Output as machine-readable JSON",
+              "description_cn": "以机器可读的 JSON 格式输出",
+              "default": false
+            },
+            "config": {
+              "type": "boolean",
+              "title": "Show Config",
+              "title_cn": "显示配置",
+              "description": "Show only the config section",
+              "description_cn": "仅显示配置部分",
+              "default": false
+            },
+            "manifest": {
+              "type": "boolean",
+              "title": "Show Manifest",
+              "title_cn": "显示清单",
+              "description": "Show only the manifest section",
+              "description_cn": "仅显示清单部分",
+              "default": false
+            },
+            "footer": {
+              "type": "boolean",
+              "title": "Show Footer",
+              "title_cn": "显示尾部",
+              "description": "Show only the footer section",
+              "description_cn": "仅显示尾部部分",
+              "default": false
+            }
+          },
+          "required": ["bundlePath"]
+        },
+        {
+          "properties": {
+            "command": { "enum": ["extract"] },
+            "bundlePath": {
+              "type": "string",
+              "title": "Bundle Path",
+              "title_cn": "捆绑包路径",
+              "description": "Path to the shim program to extract",
+              "description_cn": "要提取的 shim 程序路径"
+            },
+            "outputDir": {
+              "type": "string",
+              "title": "Output Directory",
+              "title_cn": "输出目录",
+              "description": "Output directory for extracted files (default: <bundle-name>-extracted/)",
+              "description_cn": "提取文件的输出目录（默认：<bundle-name>-extracted/）"
+            }
+          },
+          "required": ["bundlePath"]
+        }
+      ]
+    }
+  }
+}

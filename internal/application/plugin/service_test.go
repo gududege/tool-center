@@ -192,7 +192,7 @@ func TestService_SaveAndLoadHistory(t *testing.T) {
 		"p1": {
 			Metadata:  plugin.PluginMetadata{ID: "p1", Name: "Plugin 1"},
 			Directory: dir,
-			Execution: plugin.ExecutionDefinition{Executable: filepath.Join(dir, "tool.exe")},
+			Execution: plugin.ExecutionDefinition{Target: filepath.Join(dir, "tool.exe")},
 		},
 	}}
 	svc := NewService(repo, nil, &testBus{}, settings.DefaultSettings())
@@ -229,7 +229,7 @@ func TestService_SaveHistory_RollingMax5(t *testing.T) {
 		"p1": {
 			Metadata:  plugin.PluginMetadata{ID: "p1", Name: "Plugin 1"},
 			Directory: dir,
-			Execution: plugin.ExecutionDefinition{Executable: filepath.Join(dir, "tool.exe")},
+			Execution: plugin.ExecutionDefinition{Target: filepath.Join(dir, "tool.exe")},
 		},
 	}}
 	svc := NewService(repo, nil, &testBus{}, settings.DefaultSettings())

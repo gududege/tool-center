@@ -51,7 +51,8 @@
       "description": "Stop after this many probes regardless of result. 0 means no limit",
       "description_cn": "达到此探测次数后停止，无论结果如何。0 表示无限制",
       "minimum": 0,
-      "maximum": 999999
+      "maximum": 999999,
+      "default": 4
     },
     "retryResolve": {
       "type": "integer",
@@ -100,7 +101,7 @@
       "title_cn": "无颜色",
       "description": "Disable ANSI colorized output",
       "description_cn": "禁用 ANSI 彩色输出",
-      "default": false
+      "default": true
     },
     "showFailuresOnly": {
       "type": "boolean",

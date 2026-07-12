@@ -38,7 +38,8 @@ type FormConfig struct {
 }
 
 type ExecutionConfig struct {
-	Exe              string            `json:"exe"`
+	Target           string            `json:"target"`
+	Runner           string            `json:"runner,omitempty"`
 	WorkingDirectory string            `json:"workingDirectory,omitempty"`
 	Environment      map[string]string `json:"environment,omitempty"`
 	Parameters       []ParameterConfig `json:"parameters,omitempty"`
@@ -165,7 +166,11 @@ func (l *Loader) loadPlugin(pluginDir string) (*plugin.Plugin, error) {
 
 	// Execution
 	if cfg.Execution != nil {
-		p.Execution.Executable = l.resolvePath(pluginDir, cfg.Execution.Exe)
+		p.Execution.Target = l.resolvePath(pluginDir, cfg.Execution.Target)
+		p.Execution.Runner = cfg.Execution.Runner
+		if p.Execution.Runner == "" {
+			p.Execution.Runner = "binary"
+		}
 		p.Execution.WorkingDirectory = cfg.Execution.WorkingDirectory
 		p.Execution.Environment = cfg.Execution.Environment
 
@@ -184,8 +189,8 @@ func (l *Loader) loadPlugin(pluginDir string) (*plugin.Plugin, error) {
 		}
 	}
 
-	if p.Execution.Executable == "" {
-		return nil, fmt.Errorf("plugin %s: executable is required", cfg.ID)
+	if p.Execution.Target == "" {
+		return nil, fmt.Errorf("plugin %s: target is required", cfg.ID)
 	}
 
 	return p, nil

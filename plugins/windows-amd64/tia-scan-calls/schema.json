@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TIA Portal Scan Calls",
+  "title_cn": "TIA Portal 调用扫描",
+  "description": "Scan exported TIA Portal source files and generate a JSON call graph",
+  "description_cn": "扫描导出的 TIA Portal 源文件，生成 JSON 调用关系图",
+  "type": "object",
+  "properties": {
+    "outputFile": {
+      "type": "string",
+      "title": "Output File",
+      "title_cn": "输出文件",
+      "description": "Path to the output JSON call graph file",
+      "description_cn": "输出的 JSON 调用关系图文件路径",
+      "default": "block_calls.json"
+    },
+    "scanPaths": {
+      "type": "array",
+      "title": "Scan Directories",
+      "title_cn": "扫描目录",
+      "description": "Directories under the export root to scan for source files",
+      "description_cn": "在导出根目录下扫描源文件的子目录列表",
+      "items": {
+        "type": "string"
+      },
+      "default": ["udts", "blocks"]
+    }
+  }
+}

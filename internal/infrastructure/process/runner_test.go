@@ -13,7 +13,7 @@ func TestRunner_StartAndWait(t *testing.T) {
 		t.Skip("cmd.exe not found, skipping Windows-specific test")
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	output := make([]string, 0)
 
 	runner.SetOutputHandler(func(taskID, line, source string) {
@@ -21,7 +21,8 @@ func TestRunner_StartAndWait(t *testing.T) {
 	})
 
 	err := runner.Start("test-1", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "echo hello world"},
 	})
 	if err != nil {
@@ -57,11 +58,12 @@ func TestRunner_Stop(t *testing.T) {
 		t.Skip("cmd.exe not found")
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	done := make(chan bool)
 
 	err := runner.Start("test-stop", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "ping -n 10 127.0.0.1 > nul"},
 	})
 	if err != nil {
@@ -90,7 +92,7 @@ func TestRunner_Stop(t *testing.T) {
 }
 
 func TestRunner_StopNonExistent(t *testing.T) {
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	err := runner.Stop("nonexistent")
 	if err == nil {
 		t.Error("expected error for non-existent process")
@@ -98,7 +100,7 @@ func TestRunner_StopNonExistent(t *testing.T) {
 }
 
 func TestRunner_WaitNonExistent(t *testing.T) {
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	_, err := runner.Wait("nonexistent")
 	if err == nil {
 		t.Error("expected error for non-existent process")
@@ -110,14 +112,15 @@ func TestRunner_IsRunning(t *testing.T) {
 		t.Skip("cmd.exe not found")
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 
 	if runner.IsRunning("no-such-process") {
 		t.Error("expected false for non-existent process")
 	}
 
 	runner.Start("test-run", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "echo running > nul"},
 	})
 
@@ -134,11 +137,12 @@ func TestRunner_ExitCode(t *testing.T) {
 		t.Skip("cmd.exe not found")
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 
 	// 执行一个会失败的命令
 	err := runner.Start("test-fail", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "exit 42"},
 	})
 	if err != nil {
@@ -162,10 +166,11 @@ func TestRunner_ExitCode(t *testing.T) {
 }
 
 func TestRunner_EmptyExecutable(t *testing.T) {
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	err := runner.Start("test-empty", domainProcess.StartRequest{
-		Executable: "",
-		Arguments:  []string{},
+		Target:    "",
+		Runner:    "binary",
+		Arguments: []string{},
 	})
 	if err == nil {
 		t.Error("expected error for empty executable")
@@ -177,7 +182,7 @@ func TestRunner_MultipleProcesses(t *testing.T) {
 		t.Skip("cmd.exe not found")
 	}
 
-	runner := NewRunner()
+	runner := NewRunner(nil, nil)
 	outputs := make(map[string][]string)
 
 	runner.SetOutputHandler(func(taskID, line, source string) {
@@ -186,11 +191,13 @@ func TestRunner_MultipleProcesses(t *testing.T) {
 
 	// 启动多个进程
 	runner.Start("p1", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "echo process one"},
 	})
 	runner.Start("p2", domainProcess.StartRequest{
-		Executable: "cmd.exe",
+		Target:   "cmd.exe",
+		Runner:   "binary",
 		Arguments:  []string{"/C", "echo process two"},
 	})
 
