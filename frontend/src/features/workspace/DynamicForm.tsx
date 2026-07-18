@@ -8,6 +8,7 @@ import type { PluginDto, Tab, OutputEventDto, PluginHistoryEntryDto } from '../.
 import { usePluginStore } from '../../stores/pluginStore'
 import { useTabStore } from '../../stores/tabStore'
 import { useOutputStore } from '../../stores/outputStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import { taskApi } from '../../services/taskApi'
 import { pluginApi } from '../../services/pluginApi'
 import { ShadowFormHost, BorderedObjectFieldTemplate } from '../../components/ui/ShadowFormHost'
@@ -32,6 +33,7 @@ export function DynamicForm({ tab }: DynamicFormProps) {
   const { fetchPlugin } = usePluginStore()
   const { setTabTaskId, updateTabTitle } = useTabStore()
   const { appendOutput } = useOutputStore()
+  const settings = useSettingsStore((s) => s.settings)
 
   const [plugin, setPlugin] = useState<PluginDto | null>(null)
   const [loading, setLoading] = useState(true)
@@ -121,8 +123,12 @@ export function DynamicForm({ tab }: DynamicFormProps) {
     return { ...(defaults as Record<string, unknown> || {}), ...formData }
   }, [plugin, localizedSchema, formData])
 
-  // 开启 preview 后实时计算命令行参数字符串。
-  const previewCommand = useMemo(() => buildCommand(plugin, resolvedFormData), [plugin, resolvedFormData])
+  const runnerPaths = settings?.runnerPaths
+  const runnerOptions = settings?.runnerOptions
+  const previewCommand = useMemo(
+    () => buildCommand(plugin, resolvedFormData, runnerPaths, runnerOptions),
+    [plugin, resolvedFormData, runnerPaths, runnerOptions],
+  )
 
   // ── Update tab title on language change ──
   useEffect(() => {

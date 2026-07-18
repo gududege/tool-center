@@ -13,12 +13,14 @@ interface OutputViewerProps {
 // 单行渲染组件，利用 React.memo 避免不必要的重渲染
 const OutputLineRow = React.memo(function OutputLineRow({
   line,
+  wordWrap,
 }: {
   line: OutputLine
+  wordWrap: boolean
 }) {
   return (
     <div
-      className={`whitespace-pre-wrap ${
+      className={`${wordWrap ? 'whitespace-pre-wrap' : 'whitespace-pre'} ${
         line.source === 'stderr'
           ? 'text-red-600 dark:text-red-400'
           : line.source === 'system'
@@ -39,6 +41,7 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
   // 窄 selector：只订阅当前 task 的输出数组
   const lines = useOutputStore((s) => s.outputs[taskId] ?? [])
   const [autoScroll, setAutoScroll] = useState(true)
+  const [wordWrap, setWordWrap] = useState(true)
   const [search, setSearch] = useState('')
   const parentRef = useRef<HTMLDivElement>(null)
   // 记录滚动前是否在底部，用于自动锁定
@@ -59,6 +62,7 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
     count: filteredLines.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => ROW_HEIGHT,
+    measureElement: (el) => el.getBoundingClientRect().height,
     overscan: 10,
   })
 
@@ -107,6 +111,14 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
         <Button
           variant="ghost"
           size="sm"
+          onClick={() => setWordWrap(!wordWrap)}
+          title={wordWrap ? 'Disable line wrapping' : 'Enable line wrapping'}
+        >
+          {wordWrap ? 'Wrap' : 'No Wrap'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setAutoScroll(!autoScroll)}
           title={t('button.auto_scroll') ?? 'Auto scroll'}
         >
@@ -138,13 +150,14 @@ export function OutputViewer({ taskId }: OutputViewerProps) {
               return (
                 <div
                   key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
                   className="absolute left-0 w-full"
                   style={{
-                    height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <OutputLineRow line={line} />
+                  <OutputLineRow line={line} wordWrap={wordWrap} />
                 </div>
               )
             })}

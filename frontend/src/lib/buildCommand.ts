@@ -1,8 +1,14 @@
 import type { PluginDto } from '../types'
 
-export function buildCommand(plugin: PluginDto | null, formData: Record<string, unknown>): string {
+export function buildCommand(
+  plugin: PluginDto | null,
+  formData: Record<string, unknown>,
+  runnerPaths?: Record<string, string>,
+  runnerOptions?: Record<string, string>,
+): string {
   if (!plugin) return ''
   const exe = plugin.execution?.target ?? ''
+  const runner = plugin.execution?.runner ?? ''
   const params = plugin.execution?.parameters ?? []
   const args: string[] = []
 
@@ -16,7 +22,10 @@ export function buildCommand(plugin: PluginDto | null, formData: Record<string, 
         break
       case 'argument-array':
         if (Array.isArray(val)) {
-          for (const v of val) args.push(String(v))
+          for (const v of val) {
+            const s = String(v)
+            if (s) args.push(s)
+          }
         }
         break
       case 'option':
@@ -34,7 +43,8 @@ export function buildCommand(plugin: PluginDto | null, formData: Record<string, 
           }
         } else {
           for (const v of val) {
-            args.push(p.flag ?? `--${p.field}`, String(v))
+            const s = String(v)
+            if (s) args.push(p.flag ?? `--${p.field}`, s)
           }
         }
         break
@@ -57,5 +67,18 @@ export function buildCommand(plugin: PluginDto | null, formData: Record<string, 
     }
   }
 
-  return `${exe} ${args.join(' ')}`.trim()
+  const parts: string[] = []
+  if (runner === 'binary' || runner === '') {
+    parts.push(exe)
+  } else {
+    const runnerPath = runnerPaths?.[runner] ?? runner
+    parts.push(runnerPath)
+    const opts = runnerOptions?.[runner] ?? ''
+    for (const opt of opts.split(' ')) {
+      if (opt) parts.push(opt)
+    }
+    parts.push(exe)
+  }
+  parts.push(...args)
+  return parts.filter(Boolean).join(' ')
 }
