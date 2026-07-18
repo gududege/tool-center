@@ -21,9 +21,10 @@ type Runner struct {
 }
 
 type runningProcess struct {
-	cmd    *exec.Cmd
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
+	cmd       *exec.Cmd
+	cancel    context.CancelFunc
+	wg        sync.WaitGroup
+	killTimer *time.Timer // Cancel 兜底 Kill 定时器，nil 表示未启用
 }
 
 func NewRunner(runnerPaths, runnerOptions map[string]string) *Runner {
@@ -133,6 +134,9 @@ func (r *Runner) Wait(processID string) (int, error) {
 
 	err := rp.cmd.Wait()
 	rp.wg.Wait()
+	if rp.killTimer != nil {
+		rp.killTimer.Stop()
+	}
 	rp.cancel()
 
 	exitCode := 0
@@ -144,6 +148,31 @@ func (r *Runner) Wait(processID string) (int, error) {
 	return exitCode, nil
 }
 
+// Cancel 优雅取消：发 Ctrl+C → 等 5min → Kill（兜底）
+func (r *Runner) Cancel(processID string) error {
+	r.mu.Lock()
+	rp, ok := r.processes[processID]
+	r.mu.Unlock()
+	if !ok {
+		return fmt.Errorf("process %s not found", processID)
+	}
+
+	if sendInterrupt(rp.cmd.Process) {
+		// 信号已发出 → 等 5 分钟让进程优雅退出再 Kill
+		// 使用 AfterFunc 以便进程提前退出时能通过 Stop 取消
+		rp.killTimer = time.AfterFunc(5*time.Minute, func() {
+			rp.cmd.Process.Kill()
+		})
+	} else {
+		// 进程无控制台（PowerShell with HideWindow），无法发信号 → 直接 Kill
+		rp.cmd.Process.Kill()
+	}
+
+	rp.cancel()
+	return nil
+}
+
+// Stop 强制停止：直接 Kill
 func (r *Runner) Stop(processID string) error {
 	r.mu.Lock()
 	rp, ok := r.processes[processID]
@@ -152,13 +181,10 @@ func (r *Runner) Stop(processID string) error {
 		return fmt.Errorf("process %s not found", processID)
 	}
 
-	sendInterrupt(rp.cmd.Process)
-
-	go func() {
-		<-time.After(5 * time.Minute)
-		rp.cmd.Process.Kill()
-	}()
-
+	rp.cmd.Process.Kill()
+	if rp.killTimer != nil {
+		rp.killTimer.Stop()
+	}
 	rp.cancel()
 	return nil
 }
@@ -174,6 +200,9 @@ func (r *Runner) Remove(processID string) {
 	r.mu.Lock()
 	rp, ok := r.processes[processID]
 	if ok {
+		if rp.killTimer != nil {
+			rp.killTimer.Stop()
+		}
 		rp.cancel()
 		delete(r.processes, processID)
 	}

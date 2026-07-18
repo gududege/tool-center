@@ -1,6 +1,38 @@
 import { create } from 'zustand'
 import type { OutputLine, OutputEventDto } from '../types'
 
+// ---------- rAF batching ----------
+// 收集 1 帧内的输出行，批量 commit 到 Zustand state
+let pendingBatch: Record<string, OutputLine[]> = {}
+let rafId: number | null = null
+
+function flushBatch(storeSet: any) {
+  rafId = null
+  const batch = pendingBatch
+  pendingBatch = {}
+  if (Object.keys(batch).length === 0) return
+
+  storeSet((state: OutputState) => {
+    const nextOutputs = { ...state.outputs }
+    for (const [tid, incoming] of Object.entries(batch)) {
+      const current = nextOutputs[tid] ?? []
+      const merged = [...current, ...incoming]
+      if (merged.length > MAX_OUTPUT_LINES) {
+        merged.splice(0, merged.length - MAX_OUTPUT_LINES)
+      }
+      nextOutputs[tid] = merged
+    }
+    return { outputs: nextOutputs }
+  })
+}
+
+function scheduleFlush(set: any) {
+  if (rafId === null) {
+    rafId = requestAnimationFrame(() => flushBatch(set))
+  }
+}
+// ----------------------------------
+
 interface OutputState {
   outputs: Record<string, OutputLine[]>
 
@@ -22,24 +54,19 @@ export const useOutputStore = create<OutputState>((set, get) => ({
       level: event.level,
       message: event.message,
     }
-    get().appendOutputLine(taskId, line)
+    // 放入待刷新队列
+    const lines = pendingBatch[taskId] ?? []
+    lines.push(line)
+    pendingBatch[taskId] = lines
+    scheduleFlush(set)
   },
 
   appendOutputLine: (taskId: string, line: OutputLine) => {
-    set((state) => {
-      const current = state.outputs[taskId] ?? []
-      const next = [...current, line]
-      // FIFO 裁剪
-      if (next.length > MAX_OUTPUT_LINES) {
-        next.splice(0, next.length - MAX_OUTPUT_LINES)
-      }
-      return {
-        outputs: {
-          ...state.outputs,
-          [taskId]: next,
-        },
-      }
-    })
+    // 也通过 batch 路径，保持一致性
+    const lines = pendingBatch[taskId] ?? []
+    lines.push(line)
+    pendingBatch[taskId] = lines
+    scheduleFlush(set)
   },
 
   setOutput: (taskId: string, lines: OutputLine[]) => {

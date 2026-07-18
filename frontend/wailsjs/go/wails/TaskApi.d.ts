@@ -13,3 +13,5 @@ export function GetTaskOutput(arg1:string):Promise<Array<wails.OutputEventDto>>;
 export function GetTasks():Promise<Array<wails.TaskDto>>;
 
 export function RunPlugin(arg1:wails.RunPluginRequest):Promise<wails.RunPluginResponse>;
+
+export function StopTask(arg1:string):Promise<wails.StopTaskResponse>;

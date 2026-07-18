@@ -10,6 +10,7 @@ import type {
   RunPluginRequest,
   RunPluginResponse,
   CancelTaskResponse,
+  StopTaskResponse,
   DeleteTaskResponse,
 } from '../types'
 
@@ -37,6 +38,10 @@ export const taskApi = {
 
   async cancelTask(taskId: string): Promise<CancelTaskResponse> {
     return backend().CancelTask(taskId)
+  },
+
+  async stopTask(taskId: string): Promise<StopTaskResponse> {
+    return backend().StopTask(taskId)
   },
 
   async deleteTask(taskId: string): Promise<DeleteTaskResponse> {

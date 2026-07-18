@@ -55,12 +55,20 @@ func (a *TaskApi) GetTasks() ([]TaskDto, error) {
 	return dtos, nil
 }
 
-// CancelTask 取消任务
+// CancelTask 取消任务（优雅：Ctrl+C → 5min → Kill）
 func (a *TaskApi) CancelTask(taskID string) (*CancelTaskResponse, error) {
 	if err := a.service.CancelTask(taskID); err != nil {
 		return &CancelTaskResponse{Success: false}, fmt.Errorf("cancel task: %w", err)
 	}
 	return &CancelTaskResponse{Success: true}, nil
+}
+
+// StopTask 强制停止任务（直接 Kill）
+func (a *TaskApi) StopTask(taskID string) (*StopTaskResponse, error) {
+	if err := a.service.StopTask(taskID); err != nil {
+		return &StopTaskResponse{Success: false}, fmt.Errorf("stop task: %w", err)
+	}
+	return &StopTaskResponse{Success: true}, nil
 }
 
 // DeleteTask 删除任务

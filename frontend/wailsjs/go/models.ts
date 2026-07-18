@@ -354,6 +354,18 @@ export namespace wails {
 	        this.runnerOptions = source["runnerOptions"];
 	    }
 	}
+	export class StopTaskResponse {
+	    success: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new StopTaskResponse(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.success = source["success"];
+	    }
+	}
 	export class SystemInfoDto {
 	    appVersion: string;
 	    buildTime: string;

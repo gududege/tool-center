@@ -11,9 +11,12 @@ const STATUS_COLORS: Record<string, string> = {
   created: 'bg-neutral-300 dark:bg-neutral-500',
   queued: 'bg-amber-500 dark:bg-amber-400',
   running: 'bg-blue-500 dark:bg-blue-400',
+  cancelling: 'bg-orange-400 animate-pulse',
+  cancelled: 'bg-orange-500 dark:bg-orange-400',
+  stopping: 'bg-red-400 animate-pulse',
+  stopped: 'bg-red-600',
   completed: 'bg-emerald-500 dark:bg-emerald-400',
   failed: 'bg-red-500 dark:bg-red-400',
-  cancelled: 'bg-orange-500 dark:bg-orange-400',
 }
 
 interface TaskItemProps {
@@ -30,6 +33,10 @@ function TaskItem({ task, onTaskClick }: TaskItemProps) {
 
   const handleCancel = async () => {
     await taskApi.cancelTask(task.id)
+  }
+
+  const handleStop = async () => {
+    await taskApi.stopTask(task.id)
   }
 
   const handleDelete = async () => {
@@ -61,15 +68,20 @@ function TaskItem({ task, onTaskClick }: TaskItemProps) {
 
       {/* 操作 */}
       <div className="flex items-center gap-1 shrink-0">
-        {task.status === 'running' && (
-          <Button variant="ghost" size="sm" onClick={handleCancel} title={t('button.stop_task')}>
-            {t('task.stop')}
-          </Button>
+        {(task.status === 'running' || task.status === 'cancelling' || task.status === 'stopping') && (
+          <>
+            <Button variant="ghost" size="sm" onClick={handleCancel} title={t('button.cancel_task')}>
+              {t('task.cancel')}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleStop} title={t('button.stop_task')}>
+              {t('task.stop')}
+            </Button>
+          </>
         )}
         <Button variant="ghost" size="sm" onClick={handleOpenOutput} title={t('button.view_output')}>
           {t('panel.output')}
         </Button>
-        {task.status !== 'running' && task.status !== 'created' && task.status !== 'queued' && (
+        {task.status !== 'running' && task.status !== 'created' && task.status !== 'queued' && task.status !== 'cancelling' && task.status !== 'stopping' && (
           <Button variant="ghost" size="sm" onClick={handleDelete} title={t('button.delete_task')}>
             ✕
           </Button>

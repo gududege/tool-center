@@ -96,6 +96,118 @@ body,
   background: #4b5563;
 }
 
+/* ANSI 转义码样式（配合 anser use_classes:true） */
+/* 装饰 */
+.ansi-bold { font-weight: 700; }
+.ansi-italic { font-style: italic; }
+.ansi-underline { text-decoration: underline; }
+.ansi-dim { opacity: 0.6; }
+.ansi-blink { animation: ansi-blink 1s step-end infinite; }
+
+/* 前景色（标准 30-37）— 默认亮色，.dark 暗色覆盖 */
+.ansi-black-fg { color: #1e293b; }
+.dark .ansi-black-fg { color: #e2e8f0; }
+
+.ansi-red-fg { color: #dc2626; }
+.dark .ansi-red-fg { color: #ef4444; }
+
+.ansi-green-fg { color: #16a34a; }
+.dark .ansi-green-fg { color: #22c55e; }
+
+.ansi-yellow-fg { color: #ca8a04; }
+.dark .ansi-yellow-fg { color: #eab308; }
+
+.ansi-blue-fg { color: #2563eb; }
+.dark .ansi-blue-fg { color: #60a5fa; }
+
+.ansi-magenta-fg { color: #c026d3; }
+.dark .ansi-magenta-fg { color: #d946ef; }
+
+.ansi-cyan-fg { color: #0891b2; }
+.dark .ansi-cyan-fg { color: #06b6d4; }
+
+.ansi-white-fg { color: #334155; }
+.dark .ansi-white-fg { color: #f8fafc; }
+
+/* 背景色（标准 40-47） */
+.ansi-black-bg { background-color: #334155; }
+.dark .ansi-black-bg { background-color: #475569; }
+
+.ansi-red-bg { background-color: #dc2626; }
+.dark .ansi-red-bg { background-color: #ef4444; }
+
+.ansi-green-bg { background-color: #16a34a; }
+.dark .ansi-green-bg { background-color: #22c55e; }
+
+.ansi-yellow-bg { background-color: #ca8a04; }
+.dark .ansi-yellow-bg { background-color: #eab308; }
+
+.ansi-blue-bg { background-color: #2563eb; }
+.dark .ansi-blue-bg { background-color: #3b82f6; }
+
+.ansi-magenta-bg { background-color: #c026d3; }
+.dark .ansi-magenta-bg { background-color: #d946ef; }
+
+.ansi-cyan-bg { background-color: #0891b2; }
+.dark .ansi-cyan-bg { background-color: #06b6d4; }
+
+.ansi-white-bg { background-color: #cbd5e1; }
+.dark .ansi-white-bg { background-color: #334155; }
+
+/* 亮色前景（bright 90-97） */
+.ansi-bright-black-fg { color: #64748b; }
+.dark .ansi-bright-black-fg { color: #94a3b8; }
+
+.ansi-bright-red-fg { color: #dc2626; }
+.dark .ansi-bright-red-fg { color: #fca5a5; }
+
+.ansi-bright-green-fg { color: #16a34a; }
+.dark .ansi-bright-green-fg { color: #86efac; }
+
+.ansi-bright-yellow-fg { color: #a16207; }
+.dark .ansi-bright-yellow-fg { color: #fde047; }
+
+.ansi-bright-blue-fg { color: #2563eb; }
+.dark .ansi-bright-blue-fg { color: #93c5fd; }
+
+.ansi-bright-magenta-fg { color: #a21caf; }
+.dark .ansi-bright-magenta-fg { color: #f0abfc; }
+
+.ansi-bright-cyan-fg { color: #0891b2; }
+.dark .ansi-bright-cyan-fg { color: #67e8f9; }
+
+.ansi-bright-white-fg { color: #475569; }
+.dark .ansi-bright-white-fg { color: #ffffff; }
+
+/* 亮色背景（bright 100-107） */
+.ansi-bright-black-bg { background-color: #94a3b8; }
+.dark .ansi-bright-black-bg { background-color: #64748b; }
+
+.ansi-bright-red-bg { background-color: #fca5a5; }
+.dark .ansi-bright-red-bg { background-color: #7f1d1d; }
+
+.ansi-bright-green-bg { background-color: #86efac; }
+.dark .ansi-bright-green-bg { background-color: #14532d; }
+
+.ansi-bright-yellow-bg { background-color: #fde047; }
+.dark .ansi-bright-yellow-bg { background-color: #713f12; }
+
+.ansi-bright-blue-bg { background-color: #93c5fd; }
+.dark .ansi-bright-blue-bg { background-color: #1e3a5f; }
+
+.ansi-bright-magenta-bg { background-color: #f0abfc; }
+.dark .ansi-bright-magenta-bg { background-color: #4a0e4e; }
+
+.ansi-bright-cyan-bg { background-color: #67e8f9; }
+.dark .ansi-bright-cyan-bg { background-color: #164e63; }
+
+.ansi-bright-white-bg { background-color: #e2e8f0; }
+.dark .ansi-bright-white-bg { background-color: #334155; }
+
+@keyframes ansi-blink {
+  50% { opacity: 0; }
+}
+
 /* 输入框 focus */
 input:focus,
 select:focus,

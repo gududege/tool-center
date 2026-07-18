@@ -66,6 +66,13 @@ type TaskCancelled struct {
 
 func (e TaskCancelled) Topic() string { return "task.cancelled" }
 
+// TaskStopped 任务强制停止事件
+type TaskStopped struct {
+	TaskID string
+}
+
+func (e TaskStopped) Topic() string { return "task.stopped" }
+
 // TaskStatusChanged 任务状态变更事件
 type TaskStatusChanged struct {
 	TaskID    string

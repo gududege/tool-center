@@ -37,6 +37,7 @@ func (b *EventBridge) Start() {
 	b.subscribe("task.completed", "task:completed", b.toTaskCompleted)
 	b.subscribe("task.failed", "task:failed", b.toTaskFailed)
 	b.subscribe("task.cancelled", "task:cancelled", b.toTaskCancelled)
+	b.subscribe("task.stopped", "task:stopped", b.toTaskStopped)
 	b.subscribe("task.status-changed", "task:status-changed", b.toTaskStatusChanged)
 	b.subscribe("output.received", "output:append", b.toOutputAppend)
 }
@@ -109,6 +110,14 @@ func (b *EventBridge) toTaskCancelled(e events.DomainEvent) any {
 		return nil
 	}
 	return TaskCancelledEvent{TaskID: event.TaskID}
+}
+
+func (b *EventBridge) toTaskStopped(e events.DomainEvent) any {
+	event, ok := e.(events.TaskStopped)
+	if !ok {
+		return nil
+	}
+	return TaskStoppedEvent{TaskID: event.TaskID}
 }
 
 func (b *EventBridge) toTaskStatusChanged(e events.DomainEvent) any {

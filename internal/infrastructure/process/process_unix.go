@@ -11,6 +11,7 @@ func setCreateProcessGroup(cmd *exec.Cmd) {}
 
 func setHideWindow(cmd *exec.Cmd) {}
 
-func sendInterrupt(p *os.Process) {
+func sendInterrupt(p *os.Process) bool {
 	p.Signal(os.Interrupt)
+	return true
 }

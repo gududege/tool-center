@@ -71,7 +71,10 @@ export type TaskStatus =
   | 'running'
   | 'completed'
   | 'failed'
+  | 'cancelling'
   | 'cancelled'
+  | 'stopping'
+  | 'stopped'
 
 export interface TaskDto {
   id: string
@@ -131,6 +134,10 @@ export interface RunPluginResponse {
 }
 
 export interface CancelTaskResponse {
+  success: boolean
+}
+
+export interface StopTaskResponse {
   success: boolean
 }
 
@@ -198,6 +205,10 @@ export interface TaskFailedEvent {
 }
 
 export interface TaskCancelledEvent {
+  taskId: string
+}
+
+export interface TaskStoppedEvent {
   taskId: string
 }
 

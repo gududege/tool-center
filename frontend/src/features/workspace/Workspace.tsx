@@ -1,10 +1,11 @@
+import React, { useMemo } from 'react'
 import { useTabStore } from '../../stores/tabStore'
 import { useOutputStore } from '../../stores/outputStore'
 import { DynamicForm } from './DynamicForm'
 import { ScrollArea } from '../../components/ui/ScrollArea'
 import { useT } from '../../contexts/TranslationContext'
 import { ansiToHtml } from '../../lib/ansiToHtml'
-import type { Tab, OutputLine } from '../../types'
+import type { Tab } from '../../types'
 
 export function Workspace() {
   const { t } = useT()
@@ -80,24 +81,27 @@ export function Workspace() {
 /**
  * 输出 Tab — 只读日志查看
  */
-function OutputTab({ tab }: { tab: Tab }) {
+const OutputTab = React.memo(function OutputTab({ tab }: { tab: Tab }) {
   const { t } = useT()
-  const outputs = useOutputStore((s) => s.outputs)
-  const outputLines = tab.taskId ? outputs[tab.taskId] ?? [] : []
+  const outputLines = useOutputStore((s) => tab.taskId ? s.outputs[tab.taskId] ?? [] : [])
+  const htmlLines = useMemo(
+    () => outputLines.map((l) => ({ ...l, _html: ansiToHtml(l.message) })),
+    [outputLines],
+  )
 
   return (
     <div className="flex h-full flex-col p-4">
       <h3 className="mb-2 text-sm font-medium">{t('panel.output')}: {tab.title}</h3>
       <ScrollArea className="flex-1 rounded-md bg-neutral-950 p-3 font-mono text-xs text-green-400">
-        {outputLines.length === 0 ? (
+        {htmlLines.length === 0 ? (
           <p className="text-neutral-500">{t('output.no_output')}</p>
         ) : (
-          outputLines.map((line: OutputLine, i: number) => (
+          htmlLines.map((line, i) => (
             <div key={`${line.timestamp}-${i}`} className="whitespace-pre-wrap">
               <span className="text-neutral-500">[{line.timestamp?.slice(11, 19) ?? '--:--:--'}]</span>{' '}
               <span
                 className={line.level === 'error' || line.level === 'warn' ? 'text-red-400' : ''}
-                dangerouslySetInnerHTML={{ __html: ansiToHtml(line.message) }}
+                dangerouslySetInnerHTML={{ __html: line._html }}
               />
             </div>
           ))
@@ -105,4 +109,4 @@ function OutputTab({ tab }: { tab: Tab }) {
       </ScrollArea>
     </div>
   )
-}
+})

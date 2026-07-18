@@ -20,6 +20,7 @@ import (
 type ProcessRunner interface {
 	Start(processID string, req domainProcess.StartRequest) error
 	Wait(processID string) (int, error)
+	Cancel(processID string) error
 	Stop(processID string) error
 	Remove(processID string)
 	SetOutputHandler(handler func(taskID string, line string, source string))
@@ -163,13 +164,39 @@ func (s *Service) executeTask(taskID string, p *plugin.Plugin, args []string) {
 
 	exitCode, waitErr := s.runner.Wait(taskID)
 
-	if waitErr != nil {
-		t, err := s.tasks.Get(taskID)
-		if err != nil {
-			slog.Warn("executeTask: get task failed", "id", taskID, "error", err)
-			s.runner.Remove(taskID)
-			return
+	t, getErr := s.tasks.Get(taskID)
+	if getErr != nil {
+		slog.Warn("executeTask: get task failed", "id", taskID, "error", getErr)
+		s.runner.Remove(taskID)
+		return
+	}
+
+	if t.Status == domainTask.Cancelling {
+		t.Status = domainTask.Cancelled
+		now := time.Now()
+		t.EndedAt = &now
+		if err := s.tasks.Save(t); err != nil {
+			slog.Warn("executeTask: save cancelled state failed", "id", taskID, "error", err)
 		}
+		s.appendSystemOutput(taskID, "Task cancelled")
+		s.eventBus.Publish(events.TaskCancelled{TaskID: taskID})
+		s.runner.Remove(taskID)
+		return
+	}
+	if t.Status == domainTask.Stopping {
+		t.Status = domainTask.Stopped
+		now := time.Now()
+		t.EndedAt = &now
+		if err := s.tasks.Save(t); err != nil {
+			slog.Warn("executeTask: save stopped state failed", "id", taskID, "error", err)
+		}
+		s.appendSystemOutput(taskID, "Task stopped")
+		s.eventBus.Publish(events.TaskStopped{TaskID: taskID})
+		s.runner.Remove(taskID)
+		return
+	}
+
+	if waitErr != nil {
 		if t.Status.IsTerminal() {
 			if t.Status == domainTask.Cancelled {
 				s.appendSystemOutput(taskID, "Task cancelled")
@@ -193,13 +220,13 @@ func (s *Service) executeTask(taskID string, p *plugin.Plugin, args []string) {
 		t.ExitCode = &exitCode
 	})
 
-	t, err := s.tasks.Get(taskID)
+	t2, err := s.tasks.Get(taskID)
 	if err != nil {
 		slog.Warn("executeTask: get task after completion", "id", taskID, "error", err)
 		s.runner.Remove(taskID)
 		return
 	}
-	if t.Status == domainTask.Cancelled {
+	if t2.Status == domainTask.Cancelled {
 		s.appendSystemOutput(taskID, "Task cancelled")
 		s.eventBus.Publish(events.TaskCancelled{TaskID: taskID})
 	} else {
@@ -234,7 +261,7 @@ func (s *Service) saveTaskFinalState(taskID string, status domainTask.TaskStatus
 		slog.Warn("save task final state: task not found", "id", taskID)
 		return
 	}
-	if t.Status.IsTerminal() {
+	if t.Status.IsTerminal() || t.Status == domainTask.Cancelling || t.Status == domainTask.Stopping {
 		return
 	}
 	t.Status = status
@@ -311,37 +338,60 @@ func (s *Service) ListTasks() ([]*domainTask.Task, error) {
 	return s.tasks.List()
 }
 
-// CancelTask 取消任务
+// CancelTask 优雅取消任务：发 Ctrl+C → 5min → Kill
 func (s *Service) CancelTask(id string) error {
 	task, err := s.tasks.Get(id)
 	if err != nil {
 		return fmt.Errorf("task %s not found", id)
 	}
-
 	if task.Status.IsTerminal() {
 		return fmt.Errorf("task %s already finished with status %s", id, task.Status)
 	}
 
 	oldStatus := task.Status
-	task.Status = domainTask.Cancelled
-	if err := s.tasks.Save(task); err != nil {
-		slog.Warn("cancel task: save failed", "id", id, "error", err)
+	s.transitionTaskStatus(id, domainTask.Cancelling)
+
+	if err := s.runner.Cancel(id); err != nil {
+		slog.Warn("cancel task: cancel process failed", "id", id, "error", err)
 	}
 
-	if cancel, ok := s.cancels.Load(id); ok {
-		cancel.(context.CancelFunc)()
-	}
-
-	if err := s.runner.Stop(id); err != nil {
-		slog.Warn("cancel task: stop process failed", "id", id, "error", err)
-	}
-
-	s.appendSystemOutput(id, "Task cancelled by user")
+	s.appendSystemOutput(id, "Task cancelling...")
 
 	s.eventBus.Publish(events.TaskStatusChanged{
 		TaskID:    id,
 		OldStatus: string(oldStatus),
-		NewStatus: string(task.Status),
+		NewStatus: string(domainTask.Cancelling),
+	})
+
+	return nil
+}
+
+// StopTask 强制停止任务：直接 Kill
+func (s *Service) StopTask(id string) error {
+	task, err := s.tasks.Get(id)
+	if err != nil {
+		return fmt.Errorf("task %s not found", id)
+	}
+	if task.Status.IsTerminal() {
+		return fmt.Errorf("task %s already finished with status %s", id, task.Status)
+	}
+	if task.Status != domainTask.Running && task.Status != domainTask.Cancelling {
+		return fmt.Errorf("task %s is not running", id)
+	}
+
+	oldStatus := task.Status
+	s.transitionTaskStatus(id, domainTask.Stopping)
+
+	if err := s.runner.Stop(id); err != nil {
+		slog.Warn("stop task: stop process failed", "id", id, "error", err)
+	}
+
+	s.appendSystemOutput(id, "Task stopping...")
+
+	s.eventBus.Publish(events.TaskStatusChanged{
+		TaskID:    id,
+		OldStatus: string(oldStatus),
+		NewStatus: string(domainTask.Stopping),
 	})
 
 	return nil

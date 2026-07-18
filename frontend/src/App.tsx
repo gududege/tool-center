@@ -6,6 +6,7 @@ import { TaskPanel } from './features/taskPanel'
 import { OutputViewer } from './features/outputPanel'
 import { useTaskEvents } from './hooks/useTaskEvents'
 import { useTheme } from './hooks/useTheme'
+import { useWailsEvent } from './hooks/useWailsEvent'
 import { useSettingsStore } from './stores/settingsStore'
 import { useT } from './contexts/TranslationContext'
 
@@ -21,14 +22,18 @@ export default function App() {
   const [bottomTab, setBottomTab] = useState<'tasks' | 'output'>('tasks')
   const [outputTaskId, setOutputTaskId] = useState<string | null>(null)
 
+  // 确保读取 settings 仅初始化一次布局，后续主题等变更不重置用户焦点
+  const layoutInit = useRef(false)
+
   // 初始化: 加载设置
   useEffect(() => {
     fetchSettings()
   }, [])
 
-  // 设置加载后初始化布局状态
+  // 设置加载后初始化布局状态（仅首次加载时生效）
   useEffect(() => {
-    if (!settings) return
+    if (!settings || layoutInit.current) return
+    layoutInit.current = true
     setSidebarCollapsed(settings.sidebarCollapsed)
     setBottomTab(settings.bottomTab as 'tasks' | 'output')
     if (settings.language && settings.language !== lang) {
@@ -44,6 +49,11 @@ export default function App() {
 
   // 注册全局事件监听
   useTaskEvents()
+
+  // 有新任务时自动切到 task tab
+  useWailsEvent('task:created', () => {
+    setBottomTab('tasks')
+  })
 
   // 侧边栏切换 → 保存
   const handleToggleSidebar = () => {

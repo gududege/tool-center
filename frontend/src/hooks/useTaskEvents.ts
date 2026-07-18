@@ -10,6 +10,7 @@ import type {
   TaskCompletedEvent,
   TaskFailedEvent,
   TaskCancelledEvent,
+  TaskStoppedEvent,
   TaskStatusChangedEvent,
   OutputEventDto,
   PluginsReloadedEvent,
@@ -63,6 +64,14 @@ export function useTaskEvents() {
   useWailsEvent('task:cancelled', (event: TaskCancelledEvent) => {
     updateTask(event.taskId, {
       status: 'cancelled',
+      endedAt: new Date().toISOString(),
+    })
+  })
+
+  // task:stopped
+  useWailsEvent('task:stopped', (event: TaskStoppedEvent) => {
+    updateTask(event.taskId, {
+      status: 'stopped',
       endedAt: new Date().toISOString(),
     })
   })

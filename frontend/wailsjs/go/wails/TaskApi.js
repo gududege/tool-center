@@ -25,3 +25,7 @@ export function GetTasks() {
 export function RunPlugin(arg1) {
   return window['go']['wails']['TaskApi']['RunPlugin'](arg1);
 }
+
+export function StopTask(arg1) {
+  return window['go']['wails']['TaskApi']['StopTask'](arg1);
+}

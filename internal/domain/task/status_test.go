@@ -12,9 +12,12 @@ func TestTaskStatus_IsTerminal(t *testing.T) {
 		{Created, false},
 		{Queued, false},
 		{Running, false},
+		{Cancelling, false},
+		{Stopping, false},
 		{Completed, true},
 		{Failed, true},
 		{Cancelled, true},
+		{Stopped, true},
 	}
 
 	for _, tt := range tests {
@@ -36,7 +39,10 @@ func TestTaskStatus_ValidTransitions(t *testing.T) {
 		{Queued, Running, true},
 		{Running, Completed, true},
 		{Running, Failed, true},
-		{Running, Cancelled, true},
+		{Running, Cancelling, true},
+		{Cancelling, Cancelled, true},
+		{Running, Stopping, true},
+		{Stopping, Stopped, true},
 
 		// 非法转换
 		{Created, Running, false},
@@ -45,6 +51,7 @@ func TestTaskStatus_ValidTransitions(t *testing.T) {
 		{Completed, Running, false},
 		{Failed, Running, false},
 		{Cancelled, Running, false},
+		{Stopped, Running, false},
 		{Completed, Failed, false},
 
 		// 相同状态

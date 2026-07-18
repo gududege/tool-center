@@ -98,6 +98,10 @@ func (s *stubRunner) Stop(processID string) error {
 	return nil
 }
 
+func (s *stubRunner) Cancel(processID string) error {
+	return s.Stop(processID)
+}
+
 func (s *stubRunner) Remove(processID string) {
 	s.mu.Lock()
 	delete(s.started, processID)
@@ -119,9 +123,10 @@ type stubFailRunner struct{}
 func (s *stubFailRunner) Start(processID string, req domainProcess.StartRequest) error {
 	return errors.New("start failed")
 }
-func (s *stubFailRunner) Wait(processID string) (int, error) { return -1, nil }
-func (s *stubFailRunner) Stop(processID string) error        { return nil }
-func (s *stubFailRunner) Remove(processID string)            {}
+func (s *stubFailRunner) Wait(processID string) (int, error)       { return -1, nil }
+func (s *stubFailRunner) Cancel(processID string) error            { return nil }
+func (s *stubFailRunner) Stop(processID string) error              { return nil }
+func (s *stubFailRunner) Remove(processID string)                  {}
 func (s *stubFailRunner) SetOutputHandler(handler func(taskID string, line string, source string)) {}
 
 type eventCollector struct {
@@ -207,7 +212,7 @@ func TestService_RunPlugin(t *testing.T) {
 		t.Errorf("PluginID = %s, want test-plugin", task.PluginID)
 	}
 	if task.Status != domainTask.Completed {
-		t.Errorf("Status = %s, want %s", task.Status, domainTask.Completed)
+		t.Errorf("Status = %s, want %s (cancelling)", task.Status, domainTask.Completed)
 	}
 }
 
@@ -294,8 +299,8 @@ func TestService_CancelTask(t *testing.T) {
 	}
 
 	task, _ := svc.GetTask(taskID)
-	if task.Status != domainTask.Cancelled {
-		t.Errorf("Status = %s, want %s", task.Status, domainTask.Cancelled)
+	if task.Status != domainTask.Cancelling {
+		t.Errorf("Status = %s, want %s (cancelling)", task.Status, domainTask.Cancelled)
 	}
 }
 

@@ -133,6 +133,11 @@ type CancelTaskResponse struct {
 	Success bool `json:"success"`
 }
 
+// StopTaskResponse 强制停止任务响应
+type StopTaskResponse struct {
+	Success bool `json:"success"`
+}
+
 // DeleteTaskResponse 删除任务响应
 type DeleteTaskResponse struct {
 	Success bool `json:"success"`
@@ -197,6 +202,10 @@ type TaskFailedEvent struct {
 }
 
 type TaskCancelledEvent struct {
+	TaskID string `json:"taskId"`
+}
+
+type TaskStoppedEvent struct {
 	TaskID string `json:"taskId"`
 }
 
