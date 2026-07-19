@@ -34,6 +34,7 @@ describe('pluginStore', () => {
       pluginCache: {},
       loading: false,
       error: null,
+      reloadCount: 0,
     })
     vi.clearAllMocks()
   })
@@ -43,6 +44,7 @@ describe('pluginStore', () => {
     expect(state.plugins).toEqual([])
     expect(state.loading).toBe(false)
     expect(state.error).toBeNull()
+    expect(state.reloadCount).toBe(0)
   })
 
   it('fetchPlugins loads plugins into state', async () => {
@@ -114,9 +116,12 @@ describe('pluginStore', () => {
     vi.mocked(pluginApi.reloadPlugins).mockResolvedValue({ count: 2 })
     vi.mocked(pluginApi.getPlugins).mockResolvedValue(mockPlugins)
 
+    expect(usePluginStore.getState().reloadCount).toBe(0)
+
     const count = await usePluginStore.getState().reloadPlugins()
     expect(pluginApi.reloadPlugins).toHaveBeenCalledOnce()
     expect(count).toBe(2)
+    expect(usePluginStore.getState().reloadCount).toBe(1)
   })
 
   it('reloadPlugins handles failures gracefully', async () => {
