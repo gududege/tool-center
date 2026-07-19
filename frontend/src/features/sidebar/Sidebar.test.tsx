@@ -80,15 +80,14 @@ describe('buildMenuTree', () => {
     expect(groupB!.children[0].children).toHaveLength(2)
   })
 
-  it('preserves plugin order within a group', () => {
+  it('sorts plugins alphabetically within a group', () => {
     const plugins = [
       createMockPlugin({ id: 'z', name: 'Z Last', navigation: { group: ['Tools'], order: 10 } }),
       createMockPlugin({ id: 'a', name: 'A First', navigation: { group: ['Tools'], order: 1 } }),
     ]
     const tree = buildMenuTree(plugins)
-    // Note: buildMenuTree doesn't sort — it preserves insertion order
-    expect(tree[0].children[0].pluginId).toBe('z')
-    expect(tree[0].children[1].pluginId).toBe('a')
+    expect(tree[0].children[0].pluginId).toBe('a')
+    expect(tree[0].children[1].pluginId).toBe('z')
   })
 
   it('handles real Wails backend data shape', () => {

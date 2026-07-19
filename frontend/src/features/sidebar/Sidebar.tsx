@@ -53,7 +53,19 @@ export function buildMenuTree(plugins: PluginSummaryDto[], lang: string = 'en'):
     })
   }
 
-  return root
+  return sortByName(root, lang)
+}
+
+function sortByName(nodes: MenuNode[], lang: string): MenuNode[] {
+  const sorted = [...nodes].sort((a, b) =>
+    a.name.localeCompare(b.name, lang),
+  )
+  for (const node of sorted) {
+    if (node.children.length > 0) {
+      node.children = sortByName(node.children, lang)
+    }
+  }
+  return sorted
 }
 
 interface TreeNodeProps {

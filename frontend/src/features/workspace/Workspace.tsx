@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { useTabStore } from '../../stores/tabStore'
 import { useOutputStore } from '../../stores/outputStore'
+import { usePluginStore } from '../../stores/pluginStore'
 import { DynamicForm } from './DynamicForm'
 import { ScrollArea } from '../../components/ui/ScrollArea'
 import { useT } from '../../contexts/TranslationContext'
@@ -10,6 +11,7 @@ import type { Tab } from '../../types'
 export function Workspace() {
   const { t } = useT()
   const { tabs, activeTabId, activateTab, closeTab } = useTabStore()
+  const reloadCount = usePluginStore((s) => s.reloadCount)
 
   if (tabs.length === 0) {
     return (
@@ -69,7 +71,7 @@ export function Workspace() {
             {tab.taskId && tab.pluginId.startsWith('output-') ? (
               <OutputTab tab={tab} />
             ) : (
-              <DynamicForm tab={tab} />
+              <DynamicForm key={`${tab.id}-${reloadCount}`} tab={tab} />
             )}
           </div>
         ))}

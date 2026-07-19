@@ -7,6 +7,7 @@ interface PluginState {
   pluginCache: Record<string, PluginDto>
   loading: boolean
   error: string | null
+  reloadCount: number
 
   fetchPlugins: () => Promise<void>
   fetchPlugin: (id: string) => Promise<PluginDto>
@@ -18,6 +19,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   pluginCache: {},
   loading: false,
   error: null,
+  reloadCount: 0,
 
   fetchPlugins: async () => {
     set({ loading: true, error: null })
@@ -44,6 +46,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
     try {
       set({ pluginCache: {} })
       const resp = await pluginApi.reloadPlugins()
+      set({ reloadCount: get().reloadCount + 1 })
       await get().fetchPlugins()
       return resp.count
     } catch (err: any) {
